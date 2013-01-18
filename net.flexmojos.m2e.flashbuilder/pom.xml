@@ -7,8 +7,11 @@
   </parent>
   <artifactId>net.flexmojos.m2e.flashbuilder</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <name>m2e connector eclipse plugin</name>
+  <name>Flashbuilder m2e connector</name>
+  
   <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+  
   	<plugins>
   		<plugin>
   			<groupId>org.eclipse.tycho</groupId>
