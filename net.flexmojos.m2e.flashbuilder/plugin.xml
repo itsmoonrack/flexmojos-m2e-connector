@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator
+            class="net.flexmojos.m2e.flashbuilder.FlashBuilderProjectConfigurator"
+            id="net.flexmojos.m2e.flashbuilder.configurator"
+            name="FlashBuilder Connector Configurator">
+      </configurator>
+   </extension>
+
+</plugin>
