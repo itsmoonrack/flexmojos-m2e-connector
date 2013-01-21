@@ -9,5 +9,8 @@
             name="FlashBuilder Connector Configurator">
       </configurator>
    </extension>
+   <extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+   </extension>
 
 </plugin>

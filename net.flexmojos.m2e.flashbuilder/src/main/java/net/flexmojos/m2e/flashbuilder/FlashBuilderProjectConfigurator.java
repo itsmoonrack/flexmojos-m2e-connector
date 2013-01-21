@@ -17,6 +17,8 @@ public class FlashBuilderProjectConfigurator extends
 	@Override
 	public void configure(ProjectConfigurationRequest request,
 			IProgressMonitor monitor) throws CoreException {
+		// Debugger correctly stop on breakpoint when Right-clicking on a
+		// flexmojos-maven-plugin driven Maven project.
 	}
 
 }

@@ -7,16 +7,16 @@
 			<pluginExecutionFilter>
 				<groupId>net.flexmojos.oss</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
-				<versionRange>[5.0,6.0]</versionRange>
+				<versionRange>[4.9,6.0]</versionRange>
 				<goals>
+				  <goal>test-compile</goal>
 					<goal>compile-swc</goal>
 					<goal>compile-swf</goal>
 				</goals>
 			</pluginExecutionFilter>
 			<action>
 				<configurator>
-					<id>net.flexmojos.m2e.flashbuilder.FlashBuilderProjectConfigurator
-					</id>
+					<id>net.flexmojos.m2e.flashbuilder.configurator</id>
 				</configurator>
 			</action>
 		</pluginExecution>
