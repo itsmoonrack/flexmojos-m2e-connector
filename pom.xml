@@ -1,97 +1,128 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.flexmojos.oss</groupId>
-	<artifactId>flexmojos-m2e-connector</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>m2e connector for flashbuilder</name>
-	
-	<packaging>pom</packaging>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.flexmojos.oss</groupId>
+  <artifactId>flexmojos-m2e-connector</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
 
-	<properties>
-		<tycho.version>0.16.0</tycho.version>
-	</properties>
+  <name>Flexmojos Integration for Flash Builder</name>
+  <description>Flexmojos Integration for Flash Builder provides tight integration for Maven into the IDE.</description>
 
-	<licenses>
-		<license>
-			<name>EPL-1.0</name>
-			<url>http://www.eclipse.org/legal/epl-v10.html</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+  <packaging>pom</packaging>
 
-	<repositories>
-		<repository>
-			<id>eclipse-indigo</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/indigo</url>
-		</repository>
-	</repositories>
+  <properties>
+    <tycho.version>0.16.0</tycho.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho.version}</version>
-				<extensions>true</extensions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho.version}</version>
-				<configuration>
-					<target>
-						<artifact>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<classifier>TargetFileNameWithoutExtension</classifier>
-						</artifact>
-					</target>
+    <!-- eclipse version flexmojos-m2e-connector is built against -->
+    <eclipse-repo.url>http://download.eclipse.org/releases/juno</eclipse-repo.url>
+  </properties>
 
-					<environments>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>macosx</os>
-							<ws>cocoa</ws>
-							<arch>x86_64</arch>
-						</environment>
-					</environments>
+  <licenses>
+    <license>
+      <name>EPL-1.0</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<modules>
-		<module>net.flexmojos.m2e.flashbuilder</module>
-	</modules>
+  <developers>
+    <developer>
+      <id>sylvainlecoy</id>
+      <name>Sylvain Lecoy</name>
+      <email>sylvain.lecoy at gmail.com</email>
+      <roles>
+        <role>Author</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/sylvainlecoy/flexmojos-m2e-connector.git</connection>
+    <developerConnection>scm:git:https://github.com/sylvainlecoy/flexmojos-m2e-connector.git</developerConnection>
+    <url>https://github.com/sylvainlecoy/flexmojos-m2e-connector.git</url>
+  </scm>
+
+  <repositories>
+    <repository>
+      <id>eclipse-indigo</id>
+      <layout>p2</layout>
+      <url>${eclipse-repo.url}</url>
+    </repository>
+  </repositories>
+
+  <modules>
+    <module>net.flexmojos.m2e.flashbuilder</module>
+  </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>org.eclipse.m2e.core</artifactId>
+      <version>1.2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
+      <version>1.2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>net.flexmojos.oss</groupId>
+      <artifactId>flexmojos-maven-plugin</artifactId>
+      <version>6.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <extensions>true</extensions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <pomDependencies>consider</pomDependencies>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-packaging-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <format>yyyyMMdd-HHmm</format>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-surefire-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <useUIHarness>true</useUIHarness>
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
+            <argLine>${tycho.test.jvmArgs}</argLine>
+            <forkedProcessTimeoutInSeconds>7200</forkedProcessTimeoutInSeconds>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-plugin</artifactId>
+          <version>${tycho-version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

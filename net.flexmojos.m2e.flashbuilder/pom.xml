@@ -1,36 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>net.flexmojos.oss</groupId>
-		<artifactId>flexmojos-m2e-connector</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</parent>
-	<artifactId>net.flexmojos.m2e.flashbuilder</artifactId>
-	<packaging>eclipse-plugin</packaging>
-	<name>Flashbuilder m2e connector</name>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.flexmojos.oss</groupId>
+    <artifactId>flexmojos-m2e-connector</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>net.flexmojos.m2e.flashbuilder</artifactId>
+  <packaging>eclipse-plugin</packaging>
 
-	<developers>
-		<developer>
-			<id>sylvainlecoy</id>
-			<name>Sylvain Lecoy</name>
-			<email>sylvain.lecoy at gmail.com</email>
-			<roles>
-				<role>Author</role>
-				<role>Developer</role>
-			</roles>
-      <timezone>+1</timezone>
-		</developer>
-	</developers>
+  <name>m2e connector for Flashbuilder</name>
 
-	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-
-		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+  <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>
