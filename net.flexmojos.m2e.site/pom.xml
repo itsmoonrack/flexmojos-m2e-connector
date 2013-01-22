@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>net.flexmojos.oss</groupId>
+    <artifactId>m2e-flexmojos</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>net.flexmojos.m2e.site</artifactId>
+  <packaging>eclipse-repository</packaging>
+
+  <name>Flexmojos Integration for Eclipse Update Site</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <includePackedArtifacts>true</includePackedArtifacts>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>publish-site</id>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>maven-upload-plugin</artifactId>
+            <version>1.0.0</version>
+            <executions>
+              <execution>
+                <id>publish-site</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>upload-file</goal>
+                </goals>
+                <configuration>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}.zip</file>
+                  <serverId>${m2e-flexmojos.site-serverSettingsId}</serverId>
+                  <repositoryUrl>${m2e-flexmojos.site-compressed}</repositoryUrl>
+                  <repositoryPath>m2e-flexmojos/${unqualifiedVersion}/N/${unqualifiedVersion}.${buildQualifier}</repositoryPath>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

@@ -4,8 +4,8 @@
    <extension
          point="org.eclipse.m2e.core.projectConfigurators">
       <configurator
-            class="net.flexmojos.m2e.flashbuilder.FlashBuilderProjectConfigurator"
-            id="net.flexmojos.m2e.flashbuilder.configurator"
+            class="net.flexmojos.m2e.FlashBuilderProjectConfigurator"
+            id="net.flexmojos.m2e.configurator"
             name="FlashBuilder Connector Configurator">
       </configurator>
    </extension>

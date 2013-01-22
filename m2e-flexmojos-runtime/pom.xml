@@ -1,0 +1,118 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
+
+  <groupId>net.flexmojos.oss</groupId>
+  <artifactId>m2e-flexmojos-runtime</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+    <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
+    <maven-bundle-plugin.version>2.3.6</maven-bundle-plugin.version>
+    <tycho.version>0.16.0</tycho.version>
+  </properties>
+
+  <modules>
+    <module>net.flexmojos.oss.plugin</module>
+    <module>
+      ../../m2e-core/m2e-maven-runtime/com.ning.async-http-client
+    </module>
+    <module>
+      ../../m2e-core/m2e-maven-runtime/org.eclipse.m2e.archetype.common
+    </module>
+    <module>
+      ../../m2e-core/m2e-maven-runtime/org.eclipse.m2e.maven.indexer
+    </module>
+    <module>
+      ../../m2e-core/m2e-maven-runtime/org.eclipse.m2e.maven.runtime
+    </module>
+    <module>../../m2e-core/m2e-maven-runtime/org.jboss.netty</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>${maven-bundle-plugin.version}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <instructions>
+              <Embed-Transitive>true</Embed-Transitive>
+              <_failok>true</_failok>
+              <_nouses>true</_nouses>
+              <_nodefaultversion>true</_nodefaultversion>
+              <_snapshot>${osgi-version-qualifier}</_snapshot>
+
+              <Bundle-SymbolicName>${project.artifactId};singleton:=false</Bundle-SymbolicName>
+              <Bundle-RequiredExecutionEnvironment>J2SE-1.5,JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+              <Bundle-Name>%Bundle-Name</Bundle-Name>
+              <Bundle-Vendor>%Bundle-Vendor</Bundle-Vendor>
+              <Bundle-ClassPath>{maven-dependencies}</Bundle-ClassPath>
+            </instructions>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <executions>
+            <execution>
+              <id>p2-metadata</id>
+              <goals>
+                <goal>p2-metadata</goal>
+                <goal>update-local-index</goal>
+              </goals>
+              <phase>package</phase>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <activation>
+        <property>
+          <name>m2e-flexmojos.version</name>
+        </property>
+      </activation>
+      <properties>
+        <osgi-version-qualifier>qualifier</osgi-version-qualifier>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>maven-bundle-plugin</artifactId>
+              <configuration>
+                <!-- PDE does not honour custom manifest location -->
+                <manifestLocation>META-INF</manifestLocation>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+  </profiles>
+
+</project>

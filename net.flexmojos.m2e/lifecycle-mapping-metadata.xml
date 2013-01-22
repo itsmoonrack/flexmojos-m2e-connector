@@ -16,7 +16,7 @@
       </pluginExecutionFilter>
       <action>
         <configurator>
-          <id>net.flexmojos.m2e.flashbuilder.configurator</id>
+          <id>net.flexmojos.m2e.configurator</id>
         </configurator>
       </action>
     </pluginExecution>
