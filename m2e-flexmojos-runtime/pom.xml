@@ -15,24 +15,11 @@
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
     <maven-bundle-plugin.version>2.3.6</maven-bundle-plugin.version>
-    <tycho.version>0.16.0</tycho.version>
+    <tycho.version>0.15.0</tycho.version>
   </properties>
 
   <modules>
-    <module>net.flexmojos.oss.plugin</module>
-    <module>
-      ../../m2e-core/m2e-maven-runtime/com.ning.async-http-client
-    </module>
-    <module>
-      ../../m2e-core/m2e-maven-runtime/org.eclipse.m2e.archetype.common
-    </module>
-    <module>
-      ../../m2e-core/m2e-maven-runtime/org.eclipse.m2e.maven.indexer
-    </module>
-    <module>
-      ../../m2e-core/m2e-maven-runtime/org.eclipse.m2e.maven.runtime
-    </module>
-    <module>../../m2e-core/m2e-maven-runtime/org.jboss.netty</module>
+  <module>m2e-core/m2e-maven-runtime</module>
   </modules>
 
   <build>
