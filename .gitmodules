@@ -1,0 +1,3 @@
+[submodule "m2e-flexmojos-runtime/m2e-core"]
+	path = m2e-flexmojos-runtime/m2e-core
+	url = git://github.com/eclipse/m2e-core.git
