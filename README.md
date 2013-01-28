@@ -31,7 +31,7 @@ Setup your environment
 3.  Compile the project
 
     Add the repository you created in your .m2/settings.xml in a profile as follow:
-    <code>
+
     <profiles>
       <profile>
         <id>flex-mojos</id>
@@ -43,7 +43,9 @@ Setup your environment
           </repository>
         </repositories>
       </profile>
+      
+      ...
+      
     </profiles>
-    </code>
 
     Do not forget to use this profile when invoking maven on the project!
