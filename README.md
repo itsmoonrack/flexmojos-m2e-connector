@@ -32,20 +32,20 @@ Setup your environment
 
     Add the repository you created in your .m2/settings.xml in a profile as follow:
 
-    &#060;profiles&#062;
-      &#060;profile&#062;
-        &#060;id&#062;flex-mojos&#060;/id&#062;
-        &#060;repositories&#062;
-          &#060;repository&#062;
-            &#060;id&#062;fb47&#060;/id&#062;
-            &#060;layout&#062;p2&#060;/layout&#062;
-            &#060;url&#062;file:/&#060;some location&#062;\repository&#060;/url&#062;
-          &#060;/repository&#062;
-        &#060;/repositories&#062;
-      &#060;/profile&#062;
-      
-      ...
-      
-    &#060;/profiles&#062;
+        <profiles>
+          <profile>
+            <id>flex-mojos</id>
+            <repositories>
+              <repository>
+                <id>fb47</id>
+                <layout>p2</layout>
+                <url>file:/<some location>\repository</url>
+              </repository>
+            </repositories>
+          </profile>
+          
+          ...
+          
+        </profiles>
 
     Do not forget to use this profile when invoking maven on the project!
