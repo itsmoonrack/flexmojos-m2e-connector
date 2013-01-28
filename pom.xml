@@ -22,9 +22,6 @@
     
     <tycho.version>0.16.0</tycho.version>
     <tycho-extras.version>${tycho-version}</tycho-extras.version>
-
-    <!-- eclipse version m2e-flexmojos is built against -->
-    <eclipse-repo.url>http://download.eclipse.org/releases/juno</eclipse-repo.url>
   </properties>
 
   <scm>
@@ -32,14 +29,6 @@
     <developerConnection>scm:git:https://github.com/sylvainlecoy/flexmojos-m2e-connector.git</developerConnection>
     <url>https://github.com/sylvainlecoy/flexmojos-m2e-connector.git</url>
   </scm>
-
-  <repositories>
-    <repository>
-      <id>eclipse</id>
-      <layout>p2</layout>
-      <url>${eclipse-repo.url}</url>
-    </repository>
-  </repositories>
 
   <modules>
     <module>net.flexmojos.m2e</module>

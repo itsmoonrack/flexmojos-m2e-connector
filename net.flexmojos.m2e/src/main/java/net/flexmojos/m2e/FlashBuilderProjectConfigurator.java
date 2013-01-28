@@ -30,11 +30,12 @@ import com.adobe.flexbuilder.project.internal.FlexProjectSettings;
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  *
  */
-public class FlashBuilderProjectConfigurator  extends
-AbstractProjectConfigurator {
+public class FlashBuilderProjectConfigurator  extends AbstractProjectConfigurator {
 
-	public void configure(ProjectConfigurationRequest request,
-			IProgressMonitor monitor) throws CoreException {
+	/**
+	 * Configures a Project from Maven pom.xml.
+	 */
+	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 		// Check the project belongs to Flash/Flex/Air packaging.
 		final String packaging = request.getMavenProject().getPackaging();
 
