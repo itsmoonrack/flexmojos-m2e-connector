@@ -48,4 +48,4 @@ Setup your environment
           
         </profiles>
 
-    Do not forget to use this profile when invoking maven on the project!
+    Do not forget to use this profile when invoking maven on the project! It will allows Tycho to use the FlashBuilder 4.7 platform when building the m2e connector plugin. Note that you will also need to set-up a target in eclipse to use the plugins and features of your FlashBuilder installation.
