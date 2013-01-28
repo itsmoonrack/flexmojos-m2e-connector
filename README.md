@@ -4,21 +4,25 @@ Setup your environment
 1.  Compile and install the dependencies.
 
     You need first to install the m2e-flexmojos-runtime pom.xml, this is the dependencies required by the connector.
-    If you have not already fetched the submodule required, run <pre>git submodule update</pre> in the project root.
-    Then, install the maven artifact by running <pre>mvn -f m2e-flexmojos-runtime/pom.xml clean install</pre>.
+    If you have not already fetched the submodule required, run the following command in the project root:
+    <pre>git submodule update</pre>
+    Then, install the maven artifact by running: <pre>mvn -f m2e-flexmojos-runtime/pom.xml clean install</pre>
 
 2.  Create a p2 repository from FlashBuilder plugins and features.
 
     The UpdateSite Publisher Application (org.eclipse.equinox.p2.publisher.UpdateSitePublisher) is a headless application that is capable of generating metadata (p2 repositories) from an update site containing a site.xml, bundles and features.
+    
     In eclipse, create a new configuration: Run > Run Configurations... Select Eclipse Application.
     In the fieldset "Program to Run" select "Run an application" and choose org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher.
     In the Arguments tab, in the text area "Program arguments", put the following:
+    <pre>
       -metadataRepository file:/<some location>\repository
       -artifactRepository file:/<some location>\repository
       -source <location with a plugin and feature directory>
       -configs gtk.linux.x86
       -compress
       -publishArtifacts
+    </pre>
 
     Run the configuration.
 
@@ -27,6 +31,7 @@ Setup your environment
 3.  Compile the project
 
     Add the repository you created in your .m2/settings.xml in a profile as follow:
+    <pre>
     <profiles>
       <profile>
         <id>flex-mojos</id>
@@ -39,5 +44,6 @@ Setup your environment
         </repositories>
       </profile>
     </profiles>
+    </pre>
 
     Do not forget to use this profile when invoking maven on the project!
