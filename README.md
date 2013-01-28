@@ -3,8 +3,8 @@ Setup your environment
 
 1.  Compile and install the dependencies.
 
-    You need first to install the m2e-flexmojos-runtime pom.xml, this is the dependencies required by the connector.
-    If you have not already fetched the submodule required, run the following command in the project root:
+    You need first to install the m2e-flexmojos-runtime pom.xml, this maven module contain the dependencies required by the connector.
+    If you have not already fetched the git submodule required (m2e-core), run the following command in the project root:
     <pre>git submodule update</pre>
     Then, install the maven artifact by running: <pre>mvn -f m2e-flexmojos-runtime/pom.xml clean install</pre>
 
