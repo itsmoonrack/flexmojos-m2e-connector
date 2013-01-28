@@ -16,9 +16,9 @@ Setup your environment
     In the fieldset "Program to Run" select "Run an application" and choose org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher.
     In the Arguments tab, in the text area "Program arguments", put the following:
     <pre>
-      -metadataRepository file:/<some location>\repository
-      -artifactRepository file:/<some location>\repository
-      -source <location with a plugin and feature directory>
+      -metadataRepository file:/&#060;some location&#062;\repository
+      -artifactRepository file:/&#060;some location&#062;\repository
+      -source &#060;location with a plugin and feature directory&#062;
       -configs gtk.linux.x86
       -compress
       -publishArtifacts
@@ -32,20 +32,20 @@ Setup your environment
 
     Add the repository you created in your .m2/settings.xml in a profile as follow:
 
-    <profiles>
-      <profile>
-        <id>flex-mojos</id>
-        <repositories>
-          <repository>
-            <id>fb47</id>
-            <layout>p2</layout>
-            <url>file:/<some location>\repository</url>
-          </repository>
-        </repositories>
-      </profile>
+    &#060;profiles&#062;
+      &#060;profile&#062;
+        &#060;id&#062;flex-mojos&#060;/id&#062;
+        &#060;repositories&#062;
+          &#060;repository&#062;
+            &#060;id&#062;fb47&#060;/id&#062;
+            &#060;layout&#062;p2&#060;/layout&#062;
+            &#060;url&#062;file:/&#060;some location&#062;\repository&#060;/url&#062;
+          &#060;/repository&#062;
+        &#060;/repositories&#062;
+      &#060;/profile&#062;
       
       ...
       
-    </profiles>
+    &#060;/profiles&#062;
 
     Do not forget to use this profile when invoking maven on the project!
