@@ -5,17 +5,12 @@ import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWF;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Resource;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
