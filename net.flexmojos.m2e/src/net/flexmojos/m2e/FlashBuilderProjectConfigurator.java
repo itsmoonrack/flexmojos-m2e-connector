@@ -47,9 +47,9 @@ public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
 
     AbstractProjectConfigurator configurator = null;
 
+    // Depending on the packaging, a Flex project can be a FlexLibraryProject, or a FlexProject. The use case
+    // for an Apollo project fall in the SWF or AIR packaging, which adds the flex nature to the project.
     if (isFlexProject(facade)) {
-      // Depending on the packaging, a Flex project can be a FlexLibraryProject, or a FlexProject. The use case
-      // for an Apollo project fall in the SWF or AIR packaging, which adds the flex nature to the project.
       if (SWC.equals(facade.getPackaging())) {
         addNature(project, "com.adobe.flexbuilder.project.flexlibnature", monitor);
         configurator = new FlexLibraryProjectConfigurator();
@@ -66,12 +66,10 @@ public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
         }
       }
     }
-    else {
-      // If the packaging is set to SWC, with no declared flex dependencies, then its an ActionScriptProject with
-      // an aslib nature.
-      if (SWC.equals(facade.getPackaging())) {
-        addNature(project, "com.adobe.flexbuilder.project.aslibnature", monitor);
-      }
+    // If the packaging is set to SWC, with no declared flex dependencies, then its an ActionScriptProject with
+    // an aslib nature.
+    else if (SWC.equals(facade.getPackaging())) {
+      addNature(project, "com.adobe.flexbuilder.project.aslibnature", monitor);
     }
 
     if (isApolloProject(facade)) {
