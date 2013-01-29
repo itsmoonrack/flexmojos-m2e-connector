@@ -25,7 +25,7 @@ Setup your environment
         -compress
         -publishArtifacts
 
-    In this example, the plugins in */<location with a plugin and feature directory>/plugins* and features in */<location with a plugin and feature directory>/features* will be published in the *file:/<some location>/repository* repository. The artifacts will also be published, and the repositories (artifacts.xml and content.xml) compressed.
+    In this example, the plugins in */&lt;location with a plugin and feature directory&gt;/plugins* and features in */&lt;location with a plugin and feature directory&gt;/features* will be published in the *file:/&lt;some location&gt;/repository* repository. The artifacts will also be published, and the repositories (artifacts.xml and content.xml) compressed.
     Run the configuration and repeat this step for each Flash Builder installation you have: 4.0, 4.5, 4.6 and 4.7. This will create different target platform.
 
     Note: you can have more information on creating a p2 repository in http://wiki.eclipse.org/Equinox/p2/Publisher#Features_And_Bundles_Publisher_Application.
@@ -57,3 +57,5 @@ Setup your environment
         </profiles>
 
     Do not forget to use this profile when invoking maven on the project! It will allows Tycho to use the Flash Builder 4.x platform when building the m2e connector plugin. Note that you will also need to set-up a new Target Definition in eclipse to use the plugins and features of your Flash Builder installation.
+    
+    Run mvn clean install on the project root.
