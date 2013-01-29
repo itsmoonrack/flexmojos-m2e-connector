@@ -78,4 +78,4 @@ Setup your environment
 
     Call this target platform Flash Builder 4.x, and make sure it is the only platform activated.
 
-    When you launch the plug-in in run or debug mode, it will create an Eclipse Application in your Run/Debug Configuration. Open it and navigates to the Plug-ins tab, in the *Launch with:* drop-down, choose plugin-ins selected bellow only. Un-thick **Workspace** check-box, and make sure all plug-ins under **Target Platform** are thick.
+    When you launch the plug-in in run or debug mode, it will create an Eclipse Application in your Run/Debug Configuration. Open it and navigates to the Plug-ins tab, in the *Launch with:* drop-down, choose plugin-ins selected bellow only. Make sure all plug-ins under **Target Platform** are thick, and check that m2e plugins under **Workspace** are un-thick, this can cause compatibility problems.

@@ -4,7 +4,6 @@ import static net.flexmojos.oss.plugin.common.FlexExtension.AIR;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWF;
 
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,8 +13,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
@@ -26,67 +27,53 @@ import com.adobe.flexbuilder.project.internal.FlexProjectSettings;
 
 /**
  * Configures a FlashBuilder project from Maven.
- * 
+ *
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  *
  */
 public class FlashBuilderProjectConfigurator  extends AbstractProjectConfigurator {
 
 	/**
-	 * Configures a Project from Maven pom.xml.
+	 * Adds the Flash/Flex/Air nature to projects qualified as Flash Builder compatible, i.e,
+	 * having a packaging of type "swc", "swf", or "air" in their pom.xml file.
 	 */
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+		IMavenProjectFacade facade = request.getMavenProjectFacade();
+		IProject project = facade.getProject();
 		// Check the project belongs to Flash/Flex/Air packaging.
-		final String packaging = request.getMavenProject().getPackaging();
-
-		if (!Arrays.asList(new String[]{AIR, SWC, SWF}).contains(packaging)) {
-			// If the project is not concerned, terminates.
+		if (!isQualifiedAsFlashBuilderProject(facade)) {
 			return;
 		}
 
+		// TODO Move out of this method what is currently bellow this line.
 		// Adds Flex and ActionScript project natures.
 		addNature(request.getProject(), "com.adobe.flexbuilder.project.flexnature", monitor);
 		addNature(request.getProject(), "com.adobe.flexbuilder.project.actionscriptnature", monitor);
 
-		IProject project = request.getProject();
 		Build build = request.getMavenProject().getBuild();
 
-		String sourceDirectory = alignToProjectDirectory(project, build.getSourceDirectory());
-		String testSourceDirectory = alignToProjectDirectory(project, build.getTestSourceDirectory());
-		//		ActionScriptProjectSettings baseSettings = new ActionScriptProjectSettings(project.getName(), project.getLocation(), false);
-		//		baseSettings.setMainSourceFolder(new Path("src/main/flex"));
-		//		baseSettings.saveDescription(project, monitor);
+		IPath sourceDirectory = facade.getProjectRelativePath(build.getSourceDirectory());
+		IPath testSourceDirectory = facade.getProjectRelativePath(build.getTestSourceDirectory());
 		FlexProjectSettings settings = new FlexProjectSettings(project.getName(), project.getLocation(), false, FlexServerType.NO_SERVER);
 		// Source folder.
-		settings.setMainSourceFolder(new Path(sourceDirectory));
+		settings.setMainSourceFolder(sourceDirectory);
 
 		// Class path entries.
-		List<Resource> resources = request.getMavenProject().getResources();
-		IClassPathEntry[] classPath = new IClassPathEntry[1 + resources.size()];
+		IPath[] resources = facade.getResourceLocations();
+		IClassPathEntry[] classPath = new IClassPathEntry[1 + resources.length];
 
-		classPath[0] = ClassPathEntryFactory.newEntry(testSourceDirectory, settings);
-		for (int i = 0; i < resources.size(); i++) {
-			String directory = alignToProjectDirectory(project, resources.get(i).getDirectory());
-			classPath[1 + i] = ClassPathEntryFactory.newEntry(directory, settings);
+		// The test source directory is treated as a supplementary source path entry.
+		classPath[0] = ClassPathEntryFactory.newEntry(testSourceDirectory.toString(), settings);
+		for (int i = 0; i < resources.length; i++) {
+			classPath[1 + i] = ClassPathEntryFactory.newEntry(resources[i].toString(), settings);
 		}
 		settings.setSourcePath(classPath);
 
 		settings.saveDescription(project, monitor);
 	}
 
-	/**
-	 * Resolves the specified path against the given project directory. The resolved path will be relative and uses the
-	 * platform-specific file separator if a base directory is given. Otherwise, the input path will be returned
-	 * unaltered.
-	 * 
-	 * @param project
-	 * @param path
-	 * @return
-	 * @throws URISyntaxException 
-	 */
-	private String alignToProjectDirectory(IProject project, String fullPath) {
-		IFile path = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(fullPath));
-		return path.getProjectRelativePath().toString();
+	private boolean isQualifiedAsFlashBuilderProject(IMavenProjectFacade facade) {
+		return Arrays.asList(new String[]{AIR, SWC, SWF}).contains(facade.getPackaging());
 	}
 
 }
