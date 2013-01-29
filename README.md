@@ -14,7 +14,7 @@ Setup your environment
     
     In eclipse, create a new configuration: Run > Run Configurations... Select Eclipse Application.
     In the fieldset "Program to Run" select "Run an application" and choose org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher.
-    In the Arguments tab, in the text area "Program arguments", put the following:
+    In the Arguments tab, put the following in the text area "Program arguments":
 
         -metadataRepository file:<some location>\repository
         -artifactRepository file:<some location>\repository
@@ -23,7 +23,8 @@ Setup your environment
         -compress
         -publishArtifacts
 
-    Run the configuration.
+    Where <some location> is your repository root and <location with a plugin and feature directory> is your Flash Builder product.
+    Run the configuration and repeat the step 2 for each Flash Builder installation you have: 4.0, 4.5, 4.6 and 4.7.
 
     Note: you can have more information on creating a p2 repository in http://wiki.eclipse.org/Equinox/p2/Publisher#Features_And_Bundles_Publisher_Application.
 
@@ -33,10 +34,10 @@ Setup your environment
 
         <profiles>
           <profile>
-            <id>flex-mojos</id>
+            <id>flash-builder-4x</id>
             <repositories>
               <repository>
-                <id>fb47</id>
+                <id>fb4x</id>
                 <layout>p2</layout>
                 <url>file:/<some location>\repository</url>
               </repository>
@@ -46,5 +47,7 @@ Setup your environment
           ...
           
         </profiles>
+
+    Where 'x' is the minor version of the Flash Builder product you want to compile against.
 
     Do not forget to use this profile when invoking maven on the project! It will allows Tycho to use the FlashBuilder 4.x platform when building the m2e connector plugin. Note that you will also need to set-up a new Target Definition in eclipse to use the plugins and features of your FlashBuilder installation.
