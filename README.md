@@ -1,16 +1,7 @@
 Setup your environment
 ----------------------
 
-1.  Clean and install the dependencies.
-
-    If you have not already fetched the git submodule required (m2e-core), run the following command in the project root:
-    <pre>git submodule update</pre>
-    This will pull the tag 1.2.0 of the m2e-core repository in your project, it is required as m2e-flexmojos is built against this version.
-
-    You need to install the maven module *m2e-flexmojos-runtime*, this maven module contain the runtime dependencies required by the connector.
-    Install the maven artifact by running: <pre>mvn -f m2e-flexmojos-runtime/pom.xml clean install</pre>
-
-2.  Create the Flash Builder 4.x target platform as a p2 repository.
+1.  Create the Flash Builder 4.x target platform as a p2 repository.
 
     The Features and Bundles Publisher Application (org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher) is a headless application that is capable of generating metadata (p2 repositories) from pre-build Eclipse bundles and features.
     
@@ -29,6 +20,15 @@ Setup your environment
     Run the configuration and repeat this step for each Flash Builder installation you have: 4.0, 4.5, 4.6 and 4.7. This will create different target platform.
 
     Note: you can have more information on creating a p2 repository in http://wiki.eclipse.org/Equinox/p2/Publisher#Features_And_Bundles_Publisher_Application.
+
+2.  Clean and install the dependencies.
+
+    If you have not already fetched the git submodule required (m2e-core), run the following command in the project root:
+    <pre>git submodule update</pre>
+    This will pull the tag 1.2.0 of the m2e-core repository in your project, it is required as m2e-flexmojos is built against this version.
+
+    You need to install the provided maven module *m2e-flexmojos-runtime*, this maven module contains the runtime dependencies required by the connector.
+    Install the maven artifact in your local repository by running: <pre>mvn -f m2e-flexmojos-runtime/pom.xml clean install</pre>
 
 3.  Compile the project.
 
@@ -58,4 +58,4 @@ Setup your environment
 
     Do not forget to use this profile when invoking maven on the project! It will allows Tycho to use the Flash Builder 4.x platform when building the m2e connector plugin. Note that you will also need to set-up a new Target Definition in eclipse to use the plugins and features of your Flash Builder installation.
     
-    Run mvn clean install on the project root.
+    Run mvn clean install on the project root. You can also use the buildall.sh script once you declared the p2 repository in your maven user's settings.xml.
