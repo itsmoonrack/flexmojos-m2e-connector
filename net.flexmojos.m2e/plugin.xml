@@ -6,7 +6,7 @@
       <configurator
             class="net.flexmojos.m2e.FlashBuilderProjectConfigurator"
             id="net.flexmojos.m2e.configurator"
-            name="FlashBuilder Connector Configurator">
+            name="%configurator.name">
       </configurator>
    </extension>
    <extension
