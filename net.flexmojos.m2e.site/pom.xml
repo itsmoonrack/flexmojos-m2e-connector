@@ -10,7 +10,7 @@
   <artifactId>net.flexmojos.m2e.site</artifactId>
   <packaging>eclipse-repository</packaging>
 
-  <name>Flexmojos Integration for Eclipse Update Site</name>
+  <name>Flexmojos Integration for Flash Builder Update Site</name>
 
   <build>
     <plugins>

@@ -12,7 +12,7 @@ Setup your environment
         -metadataRepository file:<some location>\repository
         -artifactRepository file:<some location>\repository
         -source <location with a plugin and feature directory>;
-        -configs gtk.linux.x86
+        -configs win32.win32.x86_64
         -compress
         -publishArtifacts
 
@@ -59,3 +59,23 @@ Setup your environment
     Do not forget to use this profile when invoking maven on the project! It will allows Tycho to use the Flash Builder 4.x platform when building the m2e connector plugin. Note that you will also need to set-up a new Target Definition in eclipse to use the plugins and features of your Flash Builder installation.
     
     Run mvn clean install on the project root. You can also use the buildall.sh script once you declared the p2 repository in your maven user's settings.xml.
+
+4.  Run and Debug from eclipse.
+
+    Creates the Flash Builder 4.x target by opening preferences in Window > Preferences. In Plug-in Development > Target Platform, click on *Add...*
+
+    Initialize the target definition with **Nothing: Start with an empty target definition**. Click on *Next >*.
+
+    In the *Locations* tab, click on *Add...* and select your eclipse Flash Builder directory (the directory must contain a plugins and features directory).
+    
+    In the *Environment* tab, check that the Execution Environment is set to a JavaSE-1.6 compatible JRE.
+    
+    In the *Arguments* tab, add the following in the VM arguments text area:
+        -Xms512m
+        -Xmx1024m
+        -XX:MaxPermSize=256m
+        -XX:PermSize=64m
+
+    Call this target platform Flash Builder 4.x, and make sure it is the only platform activated.
+
+    When you launch the plug-in in run or debug mode, it will create an Eclipse Application in your Run/Debug Configuration. Open it and navigates to the Plug-ins tab, in the *Launch with:* drop-down, choose plugin-ins selected bellow only. Un-thick **Workspace** check-box, and make sure all plug-ins under **Target Platform** are thick.
