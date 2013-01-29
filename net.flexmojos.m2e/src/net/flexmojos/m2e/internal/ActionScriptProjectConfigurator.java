@@ -11,14 +11,14 @@ import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSe
 
 public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator {
 
-	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-		IMavenProjectFacade facade = request.getMavenProjectFacade();
-		IProject project = facade.getProject();
+  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+    IMavenProjectFacade facade = request.getMavenProjectFacade();
+    IProject project = facade.getProject();
 
-		ActionScriptProjectSettings projectSettings = new ActionScriptProjectSettings(
-			project.getName(),
-			project.getLocation(),
-			false /* FIXME: overrideHTMLWrapperDefault */);
-	}
+    ActionScriptProjectSettings projectSettings = new ActionScriptProjectSettings(
+        project.getName(),
+        project.getLocation(),
+        false /* FIXME: overrideHTMLWrapperDefault */);
+  }
 
 }

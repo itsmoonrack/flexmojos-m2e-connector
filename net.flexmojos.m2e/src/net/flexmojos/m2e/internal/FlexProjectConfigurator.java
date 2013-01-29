@@ -11,15 +11,15 @@ import com.adobe.flexbuilder.project.internal.FlexProjectSettings;
 
 public class FlexProjectConfigurator extends AbstractFlexProjectConfigurator {
 
-	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-		IMavenProjectFacade facade = request.getMavenProjectFacade();
-		IProject project = facade.getProject();
+  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+    IMavenProjectFacade facade = request.getMavenProjectFacade();
+    IProject project = facade.getProject();
 
-		FlexProjectSettings projectSettings = new FlexProjectSettings(
-				project.getName(),
-				project.getLocation(),
-				false /* FIXME: overrideHTMLWrapperDefault */,
-				FlexServerType.NO_SERVER /* Since its a Maven project, the server is on another module. */);
-	}
+    FlexProjectSettings projectSettings = new FlexProjectSettings(
+        project.getName(),
+        project.getLocation(),
+        false /* FIXME: overrideHTMLWrapperDefault */,
+        FlexServerType.NO_SERVER /* Since its a Maven project, the server is on another module. */);
+  }
 
 }
