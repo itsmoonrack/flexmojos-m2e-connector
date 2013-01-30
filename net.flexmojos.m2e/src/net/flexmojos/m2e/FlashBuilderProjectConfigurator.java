@@ -21,8 +21,6 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
-import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSettings;
-
 /**
  * Configures a FlashBuilder project from Maven.
  *
@@ -40,79 +38,62 @@ public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     IMavenProjectFacade facade = request.getMavenProjectFacade();
     IProject project = facade.getProject();
-    // Checks the project belongs to Flash/Flex/Air packaging.
     if (!isQualifiedAsFlashBuilderProject(facade)) {
       return;
     }
 
-    AbstractProjectConfigurator configurator = null;
-
-    // Depending on the packaging, a Flex project can be a FlexLibraryProject, or a FlexProject. The use case
-    // for an Apollo project fall in the SWF or AIR packaging, which adds the flex nature to the project.
-    if (isFlexProject(facade)) {
-      if (SWC.equals(facade.getPackaging())) {
-        addNature(project, "com.adobe.flexbuilder.project.flexlibnature", monitor);
-        configurator = new FlexLibraryProjectConfigurator();
-      }
-      else {
-        addNature(project, "com.adobe.flexbuilder.project.flexnature", monitor);
-        if (AIR.equals(facade.getPackaging())) {
-          // An ApolloProject inherits from a FlexProject.
-          configurator = new ApolloProjectConfigurator();
-        }
-        else {
-          // Else it is a pure FlexProject.
-          configurator = new FlexProjectConfigurator();
-        }
-      }
-    }
-    // If the packaging is set to SWC, with no declared flex dependencies, then its an ActionScriptProject with
-    // an aslib nature.
-    else if (SWC.equals(facade.getPackaging())) {
-      addNature(project, "com.adobe.flexbuilder.project.aslibnature", monitor);
-    }
+    // Adds the ActionScript nature.
+    addNature(project, "com.adobe.flexbuilder.project.actionscriptnature", monitor);
+    // Sets the base project configurator to an ActionScript project configurator. While a project can have multiple
+    // natures, a project can not have more than one configurator. The algorithm bellow is based on "the last
+    // assignment is the right one" adding natures to the project as the execution flow goes into the branches but
+    // overriding configurators to eventually define the project.
+    ActionScriptProjectConfigurator configurator = new ActionScriptProjectConfigurator();
 
     if (isApolloProject(facade)) {
       // An Apollo project exists in two flavors: ApolloActionScriptProject, and ApolloProject. While the former
-      // is directly extending from ActionScriptProject, the later inherits from FlexProject, so it is perfectly
-      // possible for an Apollo project to be a Flex project as well.
+      // directly extends from ActionScriptProject, the later inherits from FlexProject, so it is perfectly
+      // possible for an Apollo project to have a Flex nature as well.
       addNature(project, "com.adobe.flexbuilder.project.apollonature", monitor);
+      // The configurator will replace the ActionScript project configurator initially set by an ApolloActionScript
+      // project configurator. Later in the execution flow, in the case a project have the Flex nature as well, the
+      // configurator will be replaced by a "pure" Apollo project configurator.
       configurator = new ApolloActionScriptProjectConfigurator();
     }
-
-    // Every projects have the actionscript nature.
-    addNature(project, "com.adobe.flexbuilder.project.actionscriptnature", monitor);
-    if (configurator == null) {
-      // If no project type has been found, it is a pure ActionScriptProject.
-      configurator = new ActionScriptProjectConfigurator();
+    
+    if (isFlexProject(facade)) {
+      // Depending on the packaging, a Flex project can be a FlexLibraryProject (SWC), a FlexProject (SWF) or an
+      // ApolloProject (AIR).
+      if (SWC.equals(facade.getPackaging())) {
+        addNature(project, "com.adobe.flexbuilder.project.flexlibnature", monitor);
+        configurator = new FlexLibraryProjectConfigurator();
+        // End of algorithm.
+      }
+      else {
+        // An AIR and SWF packaging indicates respectively an ApolloProject and a FlexProject, in both case the Flex
+        // nature is added to the project.
+        addNature(project, "com.adobe.flexbuilder.project.flexnature", monitor);
+        if (AIR.equals(facade.getPackaging())) {
+          configurator = new ApolloProjectConfigurator();
+          // End of algorithm.
+        }
+        else {
+          configurator = new FlexProjectConfigurator();
+          // End of algorithm.
+        }
+      }
+    }
+    else if (SWC.equals(facade.getPackaging())) {
+      // In the case there is no declared Flex dependencies, and the packaging is SWC, its an ActionScriptProject with
+      // an aslib nature.
+      addNature(project, "com.adobe.flexbuilder.project.aslibnature", monitor);
+      // End of algorithm.
     }
 
     configurator.setMarkerManager(markerManager);
     configurator.setMavenConfiguration(mavenConfiguration);
     configurator.setProjectManager(projectManager);
     configurator.configure(request, monitor);
-
-    // TODO Delegate this to respective project configurators.
-
-    //		Build build = request.getMavenProject().getBuild();
-    //
-    //		IPath sourceDirectory = facade.getProjectRelativePath(build.getSourceDirectory());
-    //		IPath testSourceDirectory = facade.getProjectRelativePath(build.getTestSourceDirectory());
-    //		// Source folder.
-    //		projectSettings.setMainSourceFolder(sourceDirectory);
-    //
-    //		// Class path entries.
-    //		IPath[] resources = facade.getResourceLocations();
-    //		IClassPathEntry[] classPath = new IClassPathEntry[1 + resources.length];
-    //
-    //		// The test source directory is treated as a supplementary source path entry.
-    //		classPath[0] = ClassPathEntryFactory.newEntry(testSourceDirectory.toString(), projectSettings);
-    //		for (int i = 0; i < resources.length; i++) {
-    //			classPath[1 + i] = ClassPathEntryFactory.newEntry(resources[i].toString(), projectSettings);
-    //		}
-    //		projectSettings.setSourcePath(classPath);
-    //
-    //		projectSettings.saveDescription(project, monitor);
   }
 
   private boolean isQualifiedAsFlashBuilderProject(IMavenProjectFacade facade) {
@@ -129,10 +110,6 @@ public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
   private boolean isApolloProject(IMavenProjectFacade facade) {
     // TODO: implement me !
     return false;
-  }
-
-  public ActionScriptProjectSettings configureActionScriptProject(ProjectConfigurationRequest request, IProgressMonitor monitor) {
-    return null;
   }
 
 }
