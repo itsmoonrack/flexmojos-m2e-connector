@@ -9,8 +9,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
-import com.adobe.flexbuilder.project.FlexProjectManager;
-import com.adobe.flexbuilder.project.FlexServerType;
 import com.adobe.flexbuilder.project.IMutableFlexProjectSettings;
 
 public class FlexProjectConfigurator extends AbstractFlexProjectConfigurator {
@@ -19,12 +17,9 @@ public class FlexProjectConfigurator extends AbstractFlexProjectConfigurator {
     facade = request.getMavenProjectFacade();
     IProject project = facade.getProject();
 
-    IMutableFlexProjectSettings settings = FlexProjectManager.createFlexProjectDescription(
-        project.getName(),
-        project.getLocation(),
-        false /* FIXME: overrideHTMLWrapperDefault */,
-        FlexServerType.NO_SERVER /* Since its a Maven project, the server is on another module. */);
+    IMutableFlexProjectSettings settings = ProjectManager.createFlexProjectDescription(project, false /* FIXME: hard-coded. */);
 
+    configureMainSourceFolder(settings);
     configureMainSourceFolder(settings);
     configureSourcePath(settings);
 
@@ -34,7 +29,7 @@ public class FlexProjectConfigurator extends AbstractFlexProjectConfigurator {
       configureTargetPlayerVersion(settings);
     }
 
-    FlexProjectManager.getFlexProject(project).setProjectDescription(settings, monitor);
+    ProjectManager.saveProjectDescription(project, settings, monitor);
   }
 
 }
