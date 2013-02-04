@@ -20,13 +20,14 @@ public class FlexProjectConfigurator extends AbstractFlexProjectConfigurator {
     IMutableFlexProjectSettings settings = ProjectManager.createFlexProjectDescription(project, false /* FIXME: hard-coded. */);
 
     configureMainSourceFolder(settings);
-    configureMainSourceFolder(settings);
     configureSourcePath(settings);
 
     Map<String, Plugin> plugins = facade.getMavenProject().getBuild().getPluginsAsMap();
     configuration = (Xpp3Dom) plugins.get("net.flexmojos.oss:flexmojos-maven-plugin").getConfiguration();
     if (configuration != null) {
       configureTargetPlayerVersion(settings);
+      configureMainApplicationPath(settings);
+      configureAdditionalCompilerArgs(settings);
     }
 
     ProjectManager.saveProjectDescription(project, settings, monitor);

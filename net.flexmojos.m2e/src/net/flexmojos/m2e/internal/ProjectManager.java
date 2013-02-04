@@ -100,6 +100,7 @@ public class ProjectManager {
 
   /**
    * Saves a Flex project settings.
+   * 
    * @param project
    * @param settings
    * @param monitor

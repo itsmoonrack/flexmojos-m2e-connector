@@ -1,5 +1,10 @@
 package net.flexmojos.m2e.internal;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.maven.model.Build;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IProject;
@@ -15,7 +20,6 @@ import com.adobe.flexbuilder.project.IClassPathEntry;
 import com.adobe.flexbuilder.project.IMutableFlexProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSettings;
-import com.adobe.flexbuilder.project.compiler.CompilerArgs;
 import com.adobe.flexbuilder.util.FlashPlayerVersion;
 
 public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator {
@@ -44,6 +48,13 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
     settings.setMainSourceFolder(sourceDirectory);
   }
 
+  /**
+   * Configures the source path so the testSourceDirectory, and additional
+   * resources locations such as default src/main/resources are added to the
+   * class path.
+   * 
+   * @param settings
+   */
   protected void configureSourcePath(IMutableActionScriptProjectSettings settings) {
     Build build = facade.getMavenProject().getBuild();
     IPath testSourceDirectory = facade.getProjectRelativePath(build.getTestSourceDirectory());
@@ -57,12 +68,25 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
     settings.setSourcePath(classPath);
   }
 
+  /**
+   * Configures the target player version, if no version is found, pass the
+   * special string "0.0.0" who has the effect of toggling off the version
+   * check.
+   * 
+   * @param settings
+   */
   protected void configureTargetPlayerVersion(IMutableFlexProjectSettings settings) {
     Xpp3Dom targetPlayer = configuration.getChild("targetPlayer");
     String formattedVersionString = (targetPlayer != null) ? targetPlayer.getValue() : "0.0.0";
     settings.setTargetPlayerVersion(new FlashPlayerVersion(formattedVersionString));
   }
-  
+
+  /**
+   * Configures the main application path, if no source file is found, use the
+   * default which is inferred from project's name.
+   * 
+   * @param settings
+   */
   protected void configureMainApplicationPath(IMutableActionScriptProjectSettings settings) {
     Xpp3Dom sourceFile = configuration.getChild("sourceFile");
     if (sourceFile != null) {
@@ -72,14 +96,74 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
   }
 
   protected void configureAdditionalCompilerArgs(IMutableActionScriptProjectSettings settings) {
-    StringBuilder arguments = new StringBuilder();
+    Map<String, Xpp3Dom> arguments = new FlexCompilerArguments();
+    settings.setAdditionalCompilerArgs(arguments.toString());
+  }
 
-    Xpp3Dom services = configuration.getChild("services");
-    if (services != null) {
-      arguments.append("-services " + services.getValue());
+  private class FlexCompilerArguments extends HashMap<String, Xpp3Dom> {
+
+    private String[] arguments = {
+        "accessible",
+        "actionscript-file-encoding"
+    };
+
+    private boolean[] argumentOperatorIsEqual = {
+        true,
+        false
+    };
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    public FlexCompilerArguments() {
+      Xpp3Dom value;
+      // TODO: navigates through the configuration instead of the full array.
+      for (Xpp3Dom config : configuration.getChildren()) {
+      }
+      // TODO: deprecate this.
+      for (String key : arguments) {
+        if ((value = configuration.getChild(toCamelCase(key.toCharArray()))) != null) {
+          put(key, value);
+        }
+      }
     }
 
-    settings.setAdditionalCompilerArgs(arguments.toString());
+    private String toCamelCase(char[] c) {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < c.length; i++) {
+        if (c[i] == '-') {
+          // Skip the hyphen and capitalize the next character.
+          sb.append(Character.toUpperCase(c[++i]));
+        }
+        else
+          sb.append(c[i]);
+      }
+      
+      return sb.toString();
+    }
+
+    public String toString() {
+      Iterator<Entry<String, Xpp3Dom>> i = entrySet().iterator();
+
+      if (!i.hasNext())
+        return "";
+
+      StringBuilder sb = new StringBuilder();
+      for (;;) {
+        Entry<String, Xpp3Dom> e = i.next();
+        String key = e.getKey();
+        Xpp3Dom value = e.getValue();
+        sb.append('-' + key);
+        sb.append(' ');
+        sb.append(value.getValue());
+        if (!i.hasNext())
+          return sb.toString();
+        sb.append(' ');
+      }
+
+    }
   }
 
 }
