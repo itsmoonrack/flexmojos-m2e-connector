@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
@@ -90,7 +91,8 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
   protected void configureMainApplicationPath(IMutableActionScriptProjectSettings settings) {
     Xpp3Dom sourceFile = configuration.getChild("sourceFile");
     if (sourceFile != null) {
-      IPath mainApplicationPath = facade.getProjectRelativePath(sourceFile.getValue());
+      IPath mainApplicationPath = new Path(sourceFile.getValue());
+      settings.setApplicationPaths(new IPath[]{mainApplicationPath});
       settings.setMainApplicationPath(mainApplicationPath);
     }
   }
@@ -102,7 +104,45 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
 
   private class FlexCompilerArguments extends HashMap<String, Xpp3Dom> {
 
-    private String[] arguments = {
+    /**
+     * Mxmlc compiler specifications.
+     * 
+     * @see http://help.adobe.com/en_US/flex/using/WS2db454920e96a9e51e63e3d11c0bf69084-7a92.html
+     */
+    private final Map<String, Character> arguments = new HashMap<String, Character>() {
+      {put("accessible", '=');}
+      {put("actionscript-file-encoding", ' ');}
+      {put("allow-source-path-overlap", '=');}
+      {put("as3", '=');}
+      {put("benchmark", '=');}
+      {put("compress", '=');}
+      {put("context-root", ' ');}
+      {put("contributor", ' ');}
+      {put("creator", ' ');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+      {put("compress", '=');}
+    };
+
+    /**String[] arguments = {
         "accessible",
         "actionscript-file-encoding"
     };
@@ -110,7 +150,7 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
     private boolean[] argumentOperatorIsEqual = {
         true,
         false
-    };
+    };*/
 
     /**
      * 
@@ -121,13 +161,22 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
       Xpp3Dom value;
       // TODO: navigates through the configuration instead of the full array.
       for (Xpp3Dom config : configuration.getChildren()) {
+        String key = toHyphenKey(config.getName().toCharArray());
       }
-      // TODO: deprecate this.
-      for (String key : arguments) {
-        if ((value = configuration.getChild(toCamelCase(key.toCharArray()))) != null) {
-          put(key, value);
+    }
+
+    private String toHyphenKey(char[] c) {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < c.length; i++) {
+        if (Character.isUpperCase(c[i])) {
+          // Inserts a hyphen and lower case the character.
+          sb.append("-" + Character.toLowerCase(c[i]));
         }
+        else
+          sb.append(c[i]);
       }
+
+      return sb.toString();
     }
 
     private String toCamelCase(char[] c) {

@@ -27,10 +27,10 @@ public class FlexProjectConfigurator extends AbstractFlexProjectConfigurator {
     if (configuration != null) {
       configureTargetPlayerVersion(settings);
       configureMainApplicationPath(settings);
-      configureAdditionalCompilerArgs(settings);
+//      configureAdditionalCompilerArgs(settings);
     }
 
-    ProjectManager.saveProjectDescription(project, settings, monitor);
+    ProjectManager.saveDescription(project, settings, monitor);
   }
 
 }
