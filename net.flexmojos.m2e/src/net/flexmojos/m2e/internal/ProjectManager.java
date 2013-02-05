@@ -6,14 +6,19 @@ import java.lang.reflect.Proxy;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.adobe.flexbuilder.project.FlexProjectManager;
 import com.adobe.flexbuilder.project.FlexServerType;
+import com.adobe.flexbuilder.project.FlexWorkspaceRunner;
+import com.adobe.flexbuilder.project.IFlexProject;
 import com.adobe.flexbuilder.project.IMutableFlexProjectSettings;
+import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
+import com.adobe.flexbuilder.project.actionscript.ActionScriptCore.ProjectCreator;
+import com.adobe.flexbuilder.project.actionscript.IActionScriptProject;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
+import com.adobe.flexbuilder.project.internal.FlexProjectSettings;
 
 /**
  * This class is responsible of instantiate a project settings object and returns it as an interface. Because the
@@ -46,15 +51,14 @@ public class ProjectManager {
         m.setAccessible(true);
       }
       catch (Exception e) {
-        IResource pom = project.getFile("pom.xml");
         String message = "Settings method " + m.getName() + " does not exist.";
-        IMarker[] markers = pom.findMarkers(IMarker.PROBLEM, false, 0);
+        IMarker[] markers = project.findMarkers(IMarker.PROBLEM, false, 0);
         for (IMarker marker : markers) {
           if (marker.getAttribute(IMarker.MESSAGE).equals(message)) {
             return null;
           }
         }
-        IMarker marker = pom.createMarker(IMarker.PROBLEM);
+        IMarker marker = project.createMarker(IMarker.PROBLEM);
         marker.setAttribute(IMarker.MESSAGE, message);
         marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
         return null;
@@ -63,9 +67,7 @@ public class ProjectManager {
       return m.invoke(settings, args);
     }
 
-    public IMutableActionScriptProjectSettings getSettings() {
-      return (IMutableActionScriptProjectSettings) settings;
-    }
+    public abstract void saveDescription(IProject project, IProgressMonitor monitor) throws CoreException;
 
   }
 
@@ -82,6 +84,12 @@ public class ProjectManager {
           FlexServerType.NO_SERVER /* Since its a Maven project, the server is on another module. */);
     }
 
+    @Override
+    public void saveDescription(IProject project, IProgressMonitor monitor) throws CoreException {
+      FlexProjectSettings flexProjectSettings = (FlexProjectSettings) settings;
+      flexProjectSettings.saveDescription(project, monitor);
+    }
+
   }
 
   /**
@@ -93,22 +101,22 @@ public class ProjectManager {
    */
   public static IMutableFlexProjectSettings createFlexProjectDescription(IProject project, boolean overrideHTMLWrapperDefault) {
     return (IMutableFlexProjectSettings) Proxy.newProxyInstance(
-        FlexProxyAdapter.class.getClassLoader(),
+        ProjectManager.class.getClassLoader(),
         new Class[] {IMutableFlexProjectSettings.class},
         new FlexProxyAdapter(project, overrideHTMLWrapperDefault));
   }
 
   /**
-   * Saves a Flex project settings.
+   * Saves a project settings.
    * 
    * @param project
    * @param settings
    * @param monitor
    * @throws CoreException
    */
-  public static void saveProjectDescription(IProject project, IMutableActionScriptProjectSettings settings, IProgressMonitor monitor) throws CoreException {
-    IMutableActionScriptProjectSettings mSettings = ((AbstractProxyAdapter)Proxy.getInvocationHandler(settings)).getSettings();
-    FlexProjectManager.getFlexProject(project).setProjectDescription(mSettings, monitor);
+  public static void saveDescription(IProject project, IMutableActionScriptProjectSettings settings, IProgressMonitor monitor) throws CoreException {
+    AbstractProxyAdapter abstractProxyAdapter = ((AbstractProxyAdapter)Proxy.getInvocationHandler(settings));
+    abstractProxyAdapter.saveDescription(project, monitor);
   }
 
 }
