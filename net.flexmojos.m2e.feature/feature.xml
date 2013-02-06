@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.flexmojos.m2e.feature"
-      label="%featureName"
-      version="1.0.0.qualifier">
+      label="Flexmojos Integration for Flash Builder"
+      version="1.0.0.qualifier"
+      provider-name="Sylvain Lecoy">
 
    <description>
-      [Enter Feature Description here.]
+      Flex Maven Integration which synchronize the project settings with the pom.xml.
    </description>
 
    <copyright url="http://www.example.com/copyright">
@@ -15,5 +16,16 @@
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
+
+   <url>
+      <update label="Flex Maven Integration" url="https://downloads.sourceforge.net/project/flexmojosm2e/repository/"/>
+   </url>
+
+   <plugin
+         id="net.flexmojos.m2e"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>

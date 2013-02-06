@@ -23,30 +23,39 @@
         </configuration>
       </plugin>
     </plugins>
+    <extensions>
+      <!-- Enabling the use of FTP -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh-external</artifactId>
+      </extension>
+    </extensions>
   </build>
 
   <profiles>
     <profile>
       <id>publish-site</id>
 
+      <distributionManagement>
+        <repository>
+          <id>sourceforge-repository</id>
+          <url>scp://frs.sourceforge.net/home/frs/project/flexmojosm2e</url>
+        </repository>
+      </distributionManagement>
+
       <build>
         <plugins>
           <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>maven-upload-plugin</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
             <executions>
               <execution>
                 <id>publish-site</id>
                 <phase>install</phase>
                 <goals>
-                  <goal>upload-file</goal>
+                  <goal>deploy</goal>
                 </goals>
                 <configuration>
-                  <file>${project.build.directory}/${project.artifactId}-${project.version}.zip</file>
-                  <serverId>${m2e-flexmojos.site-serverSettingsId}</serverId>
-                  <repositoryUrl>${m2e-flexmojos.site-compressed}</repositoryUrl>
-                  <repositoryPath>m2e-flexmojos/${unqualifiedVersion}/N/${unqualifiedVersion}.${buildQualifier}</repositoryPath>
                 </configuration>
               </execution>
             </executions>
