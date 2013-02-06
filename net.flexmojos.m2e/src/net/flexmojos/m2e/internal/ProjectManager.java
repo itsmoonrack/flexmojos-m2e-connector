@@ -11,12 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.adobe.flexbuilder.project.FlexProjectManager;
 import com.adobe.flexbuilder.project.FlexServerType;
-import com.adobe.flexbuilder.project.FlexWorkspaceRunner;
-import com.adobe.flexbuilder.project.IFlexProject;
 import com.adobe.flexbuilder.project.IMutableFlexProjectSettings;
-import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
-import com.adobe.flexbuilder.project.actionscript.ActionScriptCore.ProjectCreator;
-import com.adobe.flexbuilder.project.actionscript.IActionScriptProject;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.internal.FlexProjectSettings;
 

@@ -21,6 +21,8 @@ public class FlexProjectConfigurator extends AbstractFlexProjectConfigurator {
 
     configureMainSourceFolder(settings);
     configureSourcePath(settings);
+    configureFlexSDKName(settings);
+    configureLibraryPath(settings);
 
     Map<String, Plugin> plugins = facade.getMavenProject().getBuild().getPluginsAsMap();
     configuration = (Xpp3Dom) plugins.get("net.flexmojos.oss:flexmojos-maven-plugin").getConfiguration();

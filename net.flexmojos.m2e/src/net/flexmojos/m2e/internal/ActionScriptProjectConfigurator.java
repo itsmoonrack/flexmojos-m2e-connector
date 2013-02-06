@@ -1,11 +1,17 @@
 package net.flexmojos.m2e.internal;
 
+import static com.adobe.flexbuilder.project.IClassPathEntry.KIND_LIBRARY_FILE;
+import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IProject;
@@ -22,6 +28,7 @@ import com.adobe.flexbuilder.project.IClassPathEntry;
 import com.adobe.flexbuilder.project.IMutableFlexProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSettings;
+import com.adobe.flexbuilder.project.air.internal.ApolloProjectSettings;
 import com.adobe.flexbuilder.util.FlashPlayerVersion;
 
 public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator {
@@ -58,16 +65,18 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
    * @param settings
    */
   protected void configureSourcePath(IMutableActionScriptProjectSettings settings) {
+    List<IClassPathEntry> classPath = new ArrayList<IClassPathEntry>();
+
+    // The test source directory is treated as a supplementary source path entry.
     Build build = facade.getMavenProject().getBuild();
     IPath testSourceDirectory = facade.getProjectRelativePath(build.getTestSourceDirectory());
+    classPath.add(ClassPathEntryFactory.newEntry(testSourceDirectory.toString(), settings));
+
     IPath[] resources = facade.getResourceLocations();
-    IClassPathEntry[] classPath = new IClassPathEntry[1 + resources.length];
-    // The test source directory is treated as a supplementary source path entry.
-    classPath[0] = ClassPathEntryFactory.newEntry(testSourceDirectory.toString(), settings);
     for (int i = 0; i < resources.length; i++) {
-      classPath[1 + i] = ClassPathEntryFactory.newEntry(resources[i].toString(), settings);
+      classPath.add(ClassPathEntryFactory.newEntry(resources[i].toString(), settings));
     }
-    settings.setSourcePath(classPath);
+    settings.setSourcePath(classPath.toArray(new IClassPathEntry[classPath.size()]));
   }
 
   /**
@@ -96,6 +105,82 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
       settings.setApplicationPaths(new IPath[]{mainApplicationPath});
       settings.setMainApplicationPath(mainApplicationPath);
     }
+  }
+
+  /**
+   * Returns a Flash Builder compatible framework name from flex-sdk-description.xml.
+   * 
+   * If no version is matching, simply returns "Flex X.Y.Z".
+   * 
+   * @param fullVersion
+   * @return
+   */
+  private String getFlexSDKName(String fullVersion) {
+    String version = fullVersion.substring(0, 5);
+    String name = "Flex ";
+    if (version.equals("4.5.1")) {
+      name += "4.5.1A";
+    }
+    else if (version.equals("4.5.0")) {
+      name += "4.5A";
+    }
+    else if (version.equals("4.1.0")) {
+      name += "4.1A";
+    }
+    else if (version.equals("4.0.0")) {
+      name += "4.0A";
+    }
+    else if (version.equals("3.6.0")) {
+      name += "3.6A";
+    }
+    else if (version.equals("3.5.0")) {
+      name += "3.5B";
+    }
+    else if (version.startsWith("3.4")) {
+      name += "3.4A";
+    }
+    else if (version.equals("3.3.0")) {
+      name += "3.3A";
+    }
+    else if (version.equals("3.2.0")) {
+      name += "3.2A";
+    }
+    else if (version.startsWith("3.0")) {
+      name += "3A";
+    }
+    else {
+      name += version;
+    }
+    return name;
+  }
+
+  protected void configureFlexSDKName(IMutableActionScriptProjectSettings settings) {
+    Artifact flexFramework = facade.getMavenProject().getArtifactMap().get("com.adobe.flex.framework:flex-framework");
+    settings.setFlexSDKName(getFlexSDKName(flexFramework.getVersion()));
+  }
+
+  /**
+   * Configures the library path by adding Maven's SWC dependencies of the project.
+   * 
+   * Must be called after having set the Flex SDK Name.
+   * 
+   * @param settings
+   * @see configureFlexSDKName
+   */
+  protected void configureLibraryPath(IMutableActionScriptProjectSettings settings) {
+    List<IClassPathEntry> dependencies = new ArrayList<IClassPathEntry>(Arrays.asList(settings.getLibraryPath()));
+    for (Artifact dependency : facade.getMavenProject().getArtifacts()) {
+      // Only manage SWC type dependencies.
+      if (SWC.equals(dependency.getType())
+          // TODO: Adds a better condition handling: isNotFlash|Flex|AirFramework.
+          && !dependency.getGroupId().equals("com.adobe.air.framework")
+          && !dependency.getGroupId().equals("com.adobe.flex.framework")
+          && !dependency.getGroupId().equals("com.adobe.flash.framework")) {
+        String path  = dependency.getFile().getAbsolutePath();
+        dependencies.add(ClassPathEntryFactory.newEntry(KIND_LIBRARY_FILE, path, settings));
+      }
+    }
+    settings.setLibraryPath(dependencies.toArray(new IClassPathEntry[dependencies.size()]));
   }
 
   protected void configureAdditionalCompilerArgs(IMutableActionScriptProjectSettings settings) {

@@ -1,5 +1,18 @@
-Setup your environment
-----------------------
+Features
+--------
+
+Supports Right-click on project, Maven > Update project...
+
+The connector will synchronize the project settings in a pom first fashion:
+-   Adds Flash, Flex, Air nature to project,
+-   Adds source, test, and resources paths to project source paths,
+-   Adds Flex framework version to project (will generates "Flex 4.9.0" for flex-framework:4.9.0.1425567),
+-   Adds other SWC dependencies from local .m2 repository to project library paths.
+
+Contribute to the project
+-------------------------
+
+Contributing to the project necessitate some configuration, follow the steps bellow to successfully set-up your environment.
 
 1.  Create the Flash Builder 4.x target platform as a p2 repository.
 
