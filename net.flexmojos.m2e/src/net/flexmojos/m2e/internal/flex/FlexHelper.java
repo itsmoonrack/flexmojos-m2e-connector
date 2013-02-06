@@ -10,43 +10,41 @@ public class FlexHelper {
    * @param fullVersion
    * @return
    */
-  public static String getFlexSDKName(String fullVersion) {
-    String version = fullVersion.substring(0, 5);
-    String name = "Flex ";
+  public static String getFlexSDKName(String flexVersion) {
+    String version = flexVersion.substring(0, 5);
+
     if (version.equals("4.5.1")) {
-      name += "4.5.1A";
+      version = "4.5.1A";
     }
     else if (version.equals("4.5.0")) {
-      name += "4.5A";
+      version = "4.5A";
     }
     else if (version.equals("4.1.0")) {
-      name += "4.1A";
+      version = "4.1A";
     }
     else if (version.equals("4.0.0")) {
-      name += "4.0A";
+      version = "4.0A";
     }
     else if (version.equals("3.6.0")) {
-      name += "3.6A";
+      version = "3.6A";
     }
     else if (version.equals("3.5.0")) {
-      name += "3.5B";
+      version = "3.5B";
     }
     else if (version.startsWith("3.4")) {
-      name += "3.4A";
+      version = "3.4A";
     }
     else if (version.equals("3.3.0")) {
-      name += "3.3A";
+      version = "3.3A";
     }
     else if (version.equals("3.2.0")) {
-      name += "3.2A";
+      version = "3.2A";
     }
     else if (version.startsWith("3.0")) {
-      name += "3A";
+      version = "3A";
     }
-    else {
-      name += version;
-    }
-    return name;
+
+    return "Flex " + version;
   }
 
 }
