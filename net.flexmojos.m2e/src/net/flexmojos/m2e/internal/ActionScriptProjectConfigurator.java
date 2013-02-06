@@ -1,6 +1,5 @@
 package net.flexmojos.m2e.internal;
 
-import static com.adobe.flexbuilder.project.IClassPathEntry.KIND_LIBRARY_FILE;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 
 import java.util.ArrayList;
@@ -10,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import net.flexmojos.m2e.internal.flex.FlexHelper;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
@@ -28,7 +29,6 @@ import com.adobe.flexbuilder.project.IClassPathEntry;
 import com.adobe.flexbuilder.project.IMutableFlexProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSettings;
-import com.adobe.flexbuilder.project.air.internal.ApolloProjectSettings;
 import com.adobe.flexbuilder.util.FlashPlayerVersion;
 
 public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator {
@@ -108,61 +108,21 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
   }
 
   /**
-   * Returns a Flash Builder compatible framework name from flex-sdk-description.xml.
+   * Configures the Flex SDK name and adds it to the library path of the project.
    * 
-   * If no version is matching, simply returns "Flex X.Y.Z".
+   * Must be called before configuring the library path.
    * 
-   * @param fullVersion
-   * @return
+   * @param settings
    */
-  private String getFlexSDKName(String fullVersion) {
-    String version = fullVersion.substring(0, 5);
-    String name = "Flex ";
-    if (version.equals("4.5.1")) {
-      name += "4.5.1A";
-    }
-    else if (version.equals("4.5.0")) {
-      name += "4.5A";
-    }
-    else if (version.equals("4.1.0")) {
-      name += "4.1A";
-    }
-    else if (version.equals("4.0.0")) {
-      name += "4.0A";
-    }
-    else if (version.equals("3.6.0")) {
-      name += "3.6A";
-    }
-    else if (version.equals("3.5.0")) {
-      name += "3.5B";
-    }
-    else if (version.startsWith("3.4")) {
-      name += "3.4A";
-    }
-    else if (version.equals("3.3.0")) {
-      name += "3.3A";
-    }
-    else if (version.equals("3.2.0")) {
-      name += "3.2A";
-    }
-    else if (version.startsWith("3.0")) {
-      name += "3A";
-    }
-    else {
-      name += version;
-    }
-    return name;
-  }
-
   protected void configureFlexSDKName(IMutableActionScriptProjectSettings settings) {
     Artifact flexFramework = facade.getMavenProject().getArtifactMap().get("com.adobe.flex.framework:flex-framework");
-    settings.setFlexSDKName(getFlexSDKName(flexFramework.getVersion()));
+    settings.setFlexSDKName(FlexHelper.getFlexSDKName(flexFramework.getVersion()));
   }
 
   /**
    * Configures the library path by adding Maven's SWC dependencies of the project.
    * 
-   * Must be called after having set the Flex SDK Name.
+   * Must be called after configured the Flex SDK name.
    * 
    * @param settings
    * @see configureFlexSDKName
@@ -177,7 +137,7 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
           && !dependency.getGroupId().equals("com.adobe.flex.framework")
           && !dependency.getGroupId().equals("com.adobe.flash.framework")) {
         String path  = dependency.getFile().getAbsolutePath();
-        dependencies.add(ClassPathEntryFactory.newEntry(KIND_LIBRARY_FILE, path, settings));
+        dependencies.add(ClassPathEntryFactory.newEntry(IClassPathEntry.KIND_LIBRARY_FILE, path, settings));
       }
     }
     settings.setLibraryPath(dependencies.toArray(new IClassPathEntry[dependencies.size()]));
