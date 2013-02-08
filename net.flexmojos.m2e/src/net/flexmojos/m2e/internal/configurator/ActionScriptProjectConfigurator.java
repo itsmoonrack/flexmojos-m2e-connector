@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.internal;
+package net.flexmojos.m2e.internal.configurator;
 
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 
@@ -14,44 +14,64 @@ import net.flexmojos.m2e.internal.flex.FlexHelper;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
-import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 import com.adobe.flexbuilder.project.ClassPathEntryFactory;
 import com.adobe.flexbuilder.project.IClassPathEntry;
-import com.adobe.flexbuilder.project.IMutableFlexProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSettings;
 import com.adobe.flexbuilder.util.FlashPlayerVersion;
+import com.google.inject.Inject;
 
-public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator {
+public class ActionScriptProjectConfigurator implements IProjectConfigurator {
 
-  Xpp3Dom configuration;
-  IMavenProjectFacade facade;
+  final IMavenProjectFacade facade;
+  final IMutableActionScriptProjectSettings settings;
 
-  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    facade = request.getMavenProjectFacade();
-    IProject project = facade.getProject();
-
-    ActionScriptProjectSettings settings = new ActionScriptProjectSettings(
-        project.getName(),
-        project.getLocation(),
-        false /* FIXME: overrideHTMLWrapperDefault */);
-
-    configureMainSourceFolder(settings);
-    configureSourcePath(settings);
-
-    settings.saveDescription(project, monitor);
+  @Inject
+  public ActionScriptProjectConfigurator(IMavenProjectFacade facade, IMutableActionScriptProjectSettings settings) {
+    this.facade = facade;
+    this.settings = settings;
   }
 
-  protected void configureMainSourceFolder(IMutableActionScriptProjectSettings settings) {
+  public void configure(IProgressMonitor monitor) throws CoreException {
+    new ActionScriptProjectSettings(
+        facade.getProject().getName(),
+        facade.getProject().getLocation(),
+        false /* FIXME: overrideHTMLWrapperDefault */);
+    configureMainSourceFolder();
+    configureSourcePath();
+
+    ((ActionScriptProjectSettings) settings).saveDescription(facade.getProject(), monitor);
+  }
+
+  protected Xpp3Dom getConfiguration() {
+    Map<String, Plugin> plugins = facade.getMavenProject().getBuild().getPluginsAsMap();
+    Plugin plugin = null;
+
+    if (plugins.containsKey("net.flexmojos.oss:flexmojos-maven-plugin")) {
+      plugin = plugins.get("net.flexmojos.oss:flexmojos-maven-plugin");
+    }
+    else if (plugins.containsKey("org.sonatype.flexmojos:flexmojos-maven-plugin")) {
+      return (Xpp3Dom) plugins.get("org.sonatype.flexmojos:flexmojos-maven-plugin").getConfiguration();
+    }
+    else if (plugins.containsKey("org.apache.maven.plugins:maven-flex-plugin")) {
+      return (Xpp3Dom) plugins.get("org.apache.maven.plugins:maven-flex-plugin").getConfiguration();
+    }
+
+    return (Xpp3Dom) plugin.getConfiguration();
+  }
+
+  /**
+   * Configures the main source folder.
+   */
+  protected void configureMainSourceFolder() {
     Build build = facade.getMavenProject().getBuild();
     IPath sourceDirectory = facade.getProjectRelativePath(build.getSourceDirectory());
     settings.setMainSourceFolder(sourceDirectory);
@@ -61,10 +81,8 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
    * Configures the source path so the testSourceDirectory, and additional
    * resources locations such as default src/main/resources are added to the
    * class path.
-   * 
-   * @param settings
    */
-  protected void configureSourcePath(IMutableActionScriptProjectSettings settings) {
+  protected void configureSourcePath() {
     List<IClassPathEntry> classPath = new ArrayList<IClassPathEntry>();
 
     // The test source directory is treated as a supplementary source path entry.
@@ -84,9 +102,9 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
    * special string "0.0.0" who has the effect of toggling off the version
    * check.
    * 
-   * @param settings
+   * @param configuration
    */
-  protected void configureTargetPlayerVersion(IMutableFlexProjectSettings settings) {
+  protected void configureTargetPlayerVersion(Xpp3Dom configuration) {
     Xpp3Dom targetPlayer = configuration.getChild("targetPlayer");
     String formattedVersionString = (targetPlayer != null) ? targetPlayer.getValue() : "0.0.0";
     settings.setTargetPlayerVersion(new FlashPlayerVersion(formattedVersionString));
@@ -96,9 +114,9 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
    * Configures the main application path, if no source file is found, use the
    * default which is inferred from project's name.
    * 
-   * @param settings
+   * @param configuration
    */
-  protected void configureMainApplicationPath(IMutableActionScriptProjectSettings settings) {
+  protected void configureMainApplicationPath(Xpp3Dom configuration) {
     Xpp3Dom sourceFile = configuration.getChild("sourceFile");
     if (sourceFile != null) {
       IPath mainApplicationPath = new Path(sourceFile.getValue());
@@ -112,10 +130,10 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
    * 
    * Must be called before configuring the library path.
    * 
-   * @param settings
+   * @param flexFramework
    */
-  protected void configureFlexSDKName(IMutableActionScriptProjectSettings settings) {
-    Artifact flexFramework = facade.getMavenProject().getArtifactMap().get("com.adobe.flex.framework:flex-framework");
+  protected void configureFlexSDKName(Artifact flexFramework) {
+//    Artifact flexFramework = facade.getMavenProject().getArtifactMap().get("com.adobe.flex.framework:flex-framework");
     settings.setFlexSDKName(FlexHelper.getFlexSDKName(flexFramework.getVersion()));
   }
 
@@ -127,7 +145,7 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
    * @param settings
    * @see configureFlexSDKName
    */
-  protected void configureLibraryPath(IMutableActionScriptProjectSettings settings) {
+  protected void configureLibraryPath() {
     List<IClassPathEntry> dependencies = new ArrayList<IClassPathEntry>(Arrays.asList(settings.getLibraryPath()));
     for (Artifact dependency : facade.getMavenProject().getArtifacts()) {
       // Only manage SWC type dependencies.
@@ -143,8 +161,8 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
     settings.setLibraryPath(dependencies.toArray(new IClassPathEntry[dependencies.size()]));
   }
 
-  protected void configureAdditionalCompilerArgs(IMutableActionScriptProjectSettings settings) {
-    Map<String, Xpp3Dom> arguments = new FlexCompilerArguments();
+  protected void configureAdditionalCompilerArgs(Xpp3Dom configuration) {
+    Map<String, Xpp3Dom> arguments = new FlexCompilerArguments(configuration);
     settings.setAdditionalCompilerArgs(arguments.toString());
   }
 
@@ -203,7 +221,7 @@ public class ActionScriptProjectConfigurator extends AbstractProjectConfigurator
      */
     private static final long serialVersionUID = 1L;
 
-    public FlexCompilerArguments() {
+    public FlexCompilerArguments(Xpp3Dom configuration) {
       Xpp3Dom value;
       // TODO: navigates through the configuration instead of the full array.
       for (Xpp3Dom config : configuration.getChildren()) {
