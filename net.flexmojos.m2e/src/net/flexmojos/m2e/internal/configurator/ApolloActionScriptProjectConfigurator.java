@@ -1,27 +1,18 @@
 package net.flexmojos.m2e.internal.configurator;
 
-import org.eclipse.core.resources.IProject;
+import net.flexmojos.m2e.internal.project.IProjectManager;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
-import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
-import com.adobe.flexbuilder.project.air.internal.ApolloActionScriptProjectSettings;
 import com.google.inject.Inject;
 
 public class ApolloActionScriptProjectConfigurator extends ActionScriptProjectConfigurator {
 
   @Inject
-  public ApolloActionScriptProjectConfigurator(IMavenProjectFacade facade, IMutableActionScriptProjectSettings settings) {
-    super(facade, settings);
-  }
+  public ApolloActionScriptProjectConfigurator(IMavenProjectFacade facade, IProgressMonitor monitor, IProjectManager manager) {}
 
-  public void configure(IProgressMonitor monitor) throws CoreException {
-    IProject project = facade.getProject();
-
-    ApolloActionScriptProjectSettings projectSettings = new ApolloActionScriptProjectSettings(
-        project.getName(),
-        project.getLocation());
-  }
+  public void configure() throws CoreException {}
 
 }

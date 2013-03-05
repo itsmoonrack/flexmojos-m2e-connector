@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.internal;
+package net.flexmojos.m2e.internal.project;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -21,7 +21,7 @@ import com.adobe.flexbuilder.project.internal.FlexProjectSettings;
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  *
  */
-public class FlashBuilder47ProjectManager {
+public class FB47ProjectManager implements IProjectManager {
 
   private static class FlexProxyAdapter extends AbstractProxyAdapter implements InvocationHandler {
 
@@ -44,29 +44,22 @@ public class FlashBuilder47ProjectManager {
 
   }
 
-  /**
-   * Returns a new instance of a Flex project settings.
-   * 
-   * @param project The project.
-   * @param overrideHTMLWrapperDefault
-   * @return
+  /* (non-Javadoc)
+   * @see net.flexmojos.m2e.internal.IProjectManager#createFlexProjectDescription(org.eclipse.core.resources.IProject, boolean)
    */
-  public static IMutableFlexProjectSettings createFlexProjectDescription(IProject project, boolean overrideHTMLWrapperDefault) {
+  @Override
+  public IMutableFlexProjectSettings createFlexProjectDescription(IProject project, boolean overrideHTMLWrapperDefault) {
     return (IMutableFlexProjectSettings) Proxy.newProxyInstance(
-        FlashBuilder47ProjectManager.class.getClassLoader(),
+        FB47ProjectManager.class.getClassLoader(),
         new Class[] {IMutableFlexProjectSettings.class},
         new FlexProxyAdapter(project, overrideHTMLWrapperDefault));
   }
 
-  /**
-   * Saves a project settings.
-   * 
-   * @param project
-   * @param settings
-   * @param monitor
-   * @throws CoreException
+  /* (non-Javadoc)
+   * @see net.flexmojos.m2e.internal.IProjectManager#saveDescription(org.eclipse.core.resources.IProject, com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings, org.eclipse.core.runtime.IProgressMonitor)
    */
-  public static void saveDescription(IProject project, IMutableActionScriptProjectSettings settings, IProgressMonitor monitor) throws CoreException {
+  @Override
+  public void saveDescription(IProject project, IMutableActionScriptProjectSettings settings, IProgressMonitor monitor) throws CoreException {
     AbstractProxyAdapter abstractProxyAdapter = ((AbstractProxyAdapter)Proxy.getInvocationHandler(settings));
     abstractProxyAdapter.saveDescription(project, monitor);
   }

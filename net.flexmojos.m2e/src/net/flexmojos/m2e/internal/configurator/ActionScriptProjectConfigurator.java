@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.flexmojos.m2e.internal.flex.FlexHelper;
+import net.flexmojos.m2e.internal.project.IProjectManager;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
@@ -31,16 +32,22 @@ import com.google.inject.Inject;
 
 public class ActionScriptProjectConfigurator implements IProjectConfigurator {
 
-  final IMavenProjectFacade facade;
-  final IMutableActionScriptProjectSettings settings;
+  protected IMavenProjectFacade facade;
+  protected IProgressMonitor monitor;
+  protected IProjectManager manager;
+  protected IMutableActionScriptProjectSettings settings;
+
+  protected ActionScriptProjectConfigurator() {}
 
   @Inject
-  public ActionScriptProjectConfigurator(IMavenProjectFacade facade, IMutableActionScriptProjectSettings settings) {
+  public ActionScriptProjectConfigurator(IMavenProjectFacade facade, IProgressMonitor monitor, IProjectManager manager) {
     this.facade = facade;
-    this.settings = settings;
+    this.monitor = monitor;
+    this.manager = manager;
+//    this.settings = manager.createFlexProjectDescription(facade.getProject(), false);
   }
 
-  public void configure(IProgressMonitor monitor) throws CoreException {
+  public void configure() throws CoreException {
     new ActionScriptProjectSettings(
         facade.getProject().getName(),
         facade.getProject().getLocation(),
@@ -51,6 +58,14 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
     ((ActionScriptProjectSettings) settings).saveDescription(facade.getProject(), monitor);
   }
 
+  protected Artifact getFlexFrameworkArtifact() {
+    return facade.getMavenProject().getArtifactMap().get("com.adobe.flex.framework:flex-framework");
+  }
+  
+  /**
+   * @return Xpp3Dom
+   *   Configuration.
+   */
   protected Xpp3Dom getConfiguration() {
     Map<String, Plugin> plugins = facade.getMavenProject().getBuild().getPluginsAsMap();
     Plugin plugin = null;
@@ -132,8 +147,8 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
    * 
    * @param flexFramework
    */
-  protected void configureFlexSDKName(Artifact flexFramework) {
-//    Artifact flexFramework = facade.getMavenProject().getArtifactMap().get("com.adobe.flex.framework:flex-framework");
+  protected void configureFlexSDKName() {
+    Artifact flexFramework = getFlexFrameworkArtifact();
     settings.setFlexSDKName(FlexHelper.getFlexSDKName(flexFramework.getVersion()));
   }
 

@@ -11,6 +11,7 @@ import net.flexmojos.m2e.internal.configurator.ApolloProjectConfigurator;
 import net.flexmojos.m2e.internal.configurator.FlexLibraryProjectConfigurator;
 import net.flexmojos.m2e.internal.configurator.FlexProjectConfigurator;
 import net.flexmojos.m2e.internal.configurator.IProjectConfigurator;
+import net.flexmojos.m2e.internal.project.IProjectManager;
 
 import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.resources.IProject;
@@ -27,17 +28,18 @@ import com.google.inject.AbstractModule;
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  *
  */
-public class FlashBuilder47Module extends AbstractModule {
+public class FlashBuilderModule extends AbstractModule {
 
   private final IMavenProjectFacade facade;
   private final IProgressMonitor monitor;
+  private final Class<? extends IProjectManager> manager;
 
-  public FlashBuilder47Module(IMavenProjectFacade facade, IProgressMonitor monitor) {
+  public FlashBuilderModule(IMavenProjectFacade facade, IProgressMonitor monitor, Class<? extends IProjectManager> manager) {
     this.facade = facade;
     this.monitor = monitor;
+    this.manager = manager;
   }
 
-  @SuppressWarnings("unchecked")
   protected void configure() {
     final IProject project = facade.getProject();
 
@@ -47,8 +49,7 @@ public class FlashBuilder47Module extends AbstractModule {
     // natures, a project can not have more than one configurator. The algorithm bellow is based on "the last
     // assignment is the right one" adding natures to the project as the execution flow goes into the branches but
     // overriding configurators to eventually define the project.
-    @SuppressWarnings("rawtypes")
-    Class configurator = ActionScriptProjectConfigurator.class;
+    Class<? extends IProjectConfigurator> configurator = ActionScriptProjectConfigurator.class;
 
     if (isApolloProject()) {
       // An Apollo project exists in two flavors: ApolloActionScriptProject, and ApolloProject. While the former
@@ -60,7 +61,7 @@ public class FlashBuilder47Module extends AbstractModule {
       // configurator will be replaced by a "pure" Apollo project configurator.
       configurator = ApolloActionScriptProjectConfigurator.class;
     }
-    
+
     if (isFlexProject()) {
       // Depending on the packaging, a Flex project can be a FlexLibraryProject (SWC), a FlexProject (SWF) or an
       // ApolloProject (AIR).
@@ -90,7 +91,9 @@ public class FlashBuilder47Module extends AbstractModule {
       // End of algorithm.
     }
 
+    bind(IProjectManager.class).to(manager);
     bind(IProjectConfigurator.class).to(configurator);
+    bind(IProgressMonitor.class).toInstance(monitor);
     bind(IMavenProjectFacade.class).toInstance(facade);
   }
 

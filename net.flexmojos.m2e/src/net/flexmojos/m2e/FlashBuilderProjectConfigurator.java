@@ -6,7 +6,9 @@ import static net.flexmojos.oss.plugin.common.FlexExtension.SWF;
 
 import java.util.Arrays;
 
-import net.flexmojos.m2e.internal.FlashBuilder47Module;
+import net.flexmojos.m2e.internal.FlashBuilderModule;
+import net.flexmojos.m2e.internal.configurator.IProjectConfigurator;
+import net.flexmojos.m2e.internal.project.FB47ProjectManager;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,14 +39,11 @@ public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
       return;
     }
 
-    // Creates the project configurator through the CoreModule.
-    Injector injector = Guice.createInjector(new FlashBuilder47Module(facade, monitor));
-    AbstractProjectConfigurator configurator = injector.getInstance(AbstractProjectConfigurator.class);
+    // Creates the project configurator through the FlashBuilder47Module.
+    Injector injector = Guice.createInjector(new FlashBuilderModule(facade, monitor, FB47ProjectManager.class));
+    IProjectConfigurator configurator = injector.getInstance(IProjectConfigurator.class);
 
-    configurator.setMarkerManager(markerManager);
-    configurator.setMavenConfiguration(mavenConfiguration);
-    configurator.setProjectManager(projectManager);
-    configurator.configure(request, monitor);
+    configurator.configure();
   }
 
   private boolean isQualifiedAsFlashBuilderProject(IMavenProjectFacade facade) {
