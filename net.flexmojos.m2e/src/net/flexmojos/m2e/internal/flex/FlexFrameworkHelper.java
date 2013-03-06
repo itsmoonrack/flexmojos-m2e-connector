@@ -1,6 +1,6 @@
 package net.flexmojos.m2e.internal.flex;
 
-public class FlexHelper {
+public class FlexFrameworkHelper {
 
   /**
    * Returns a Flash Builder compatible framework name from flex-sdk-description.xml.

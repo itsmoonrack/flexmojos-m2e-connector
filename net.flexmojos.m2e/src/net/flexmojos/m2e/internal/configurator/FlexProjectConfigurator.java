@@ -1,10 +1,7 @@
 package net.flexmojos.m2e.internal.configurator;
 
-import java.util.Map;
-
 import net.flexmojos.m2e.internal.project.IProjectManager;
 
-import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -33,12 +30,11 @@ public class FlexProjectConfigurator extends AbstractFlexProjectConfigurator {
     configureFlexSDKName();
     configureLibraryPath();
 
-    Map<String, Plugin> plugins = facade.getMavenProject().getBuild().getPluginsAsMap();
-    Xpp3Dom configuration = (Xpp3Dom) plugins.get("net.flexmojos.oss:flexmojos-maven-plugin").getConfiguration();
+    Xpp3Dom configuration = getConfiguration();
     if (configuration != null) {
       configureTargetPlayerVersion(configuration);
       configureMainApplicationPath(configuration);
-//      configureAdditionalCompilerArgs(settings);
+      configureAdditionalCompilerArgs(configuration);
     }
 
     manager.saveDescription(project, settings, monitor);

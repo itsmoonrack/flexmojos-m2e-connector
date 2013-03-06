@@ -4,13 +4,12 @@ import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import net.flexmojos.m2e.internal.flex.FlexHelper;
+import net.flexmojos.m2e.internal.flex.FlexCompilerArguments;
+import net.flexmojos.m2e.internal.flex.FlexFrameworkHelper;
 import net.flexmojos.m2e.internal.project.IProjectManager;
 
 import org.apache.maven.artifact.Artifact;
@@ -149,7 +148,7 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
    */
   protected void configureFlexSDKName() {
     Artifact flexFramework = getFlexFrameworkArtifact();
-    settings.setFlexSDKName(FlexHelper.getFlexSDKName(flexFramework.getVersion()));
+    settings.setFlexSDKName(FlexFrameworkHelper.getFlexSDKName(flexFramework.getVersion()));
   }
 
   /**
@@ -177,121 +176,27 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
   }
 
   protected void configureAdditionalCompilerArgs(Xpp3Dom configuration) {
-    Map<String, Xpp3Dom> arguments = new FlexCompilerArguments(configuration);
+    FlexCompilerArguments arguments = new FlexCompilerArguments();
+
+    // Sets source-path argument.
+    List<String> pathElements = new LinkedList<String>();
+    Xpp3Dom resourceBundlePath = configuration.getChild("resourceBundlePath");
+    if (resourceBundlePath != null) {
+      pathElements.add(facade.getProjectRelativePath(resourceBundlePath.getValue()).toString());
+    }
+    arguments.setSourcePath(pathElements);
+
+    // Sets locale argument.
+    List<String> locales = new LinkedList<String>();
+    Xpp3Dom localesCompiled = configuration.getChild("localesCompiled");
+    if (localesCompiled != null) {
+      for (Xpp3Dom locale : localesCompiled.getChildren()) {
+        locales.add(locale.getValue());
+      }
+    }
+    arguments.setLocalesCompiled(locales);
+
     settings.setAdditionalCompilerArgs(arguments.toString());
-  }
-
-  private class FlexCompilerArguments extends HashMap<String, Xpp3Dom> {
-
-    /**
-     * Mxmlc compiler specifications.
-     * 
-     * @see http://help.adobe.com/en_US/flex/using/WS2db454920e96a9e51e63e3d11c0bf69084-7a92.html
-     */
-    private final Map<String, Character> arguments = new HashMap<String, Character>() {
-      {put("accessible", '=');}
-      {put("actionscript-file-encoding", ' ');}
-      {put("allow-source-path-overlap", '=');}
-      {put("as3", '=');}
-      {put("benchmark", '=');}
-      {put("compress", '=');}
-      {put("context-root", ' ');}
-      {put("contributor", ' ');}
-      {put("creator", ' ');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-      {put("compress", '=');}
-    };
-
-    /**String[] arguments = {
-        "accessible",
-        "actionscript-file-encoding"
-    };
-
-    private boolean[] argumentOperatorIsEqual = {
-        true,
-        false
-    };*/
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
-    public FlexCompilerArguments(Xpp3Dom configuration) {
-      Xpp3Dom value;
-      // TODO: navigates through the configuration instead of the full array.
-      for (Xpp3Dom config : configuration.getChildren()) {
-        String key = toHyphenKey(config.getName().toCharArray());
-      }
-    }
-
-    private String toHyphenKey(char[] c) {
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < c.length; i++) {
-        if (Character.isUpperCase(c[i])) {
-          // Inserts a hyphen and lower case the character.
-          sb.append("-" + Character.toLowerCase(c[i]));
-        }
-        else
-          sb.append(c[i]);
-      }
-
-      return sb.toString();
-    }
-
-    private String toCamelCase(char[] c) {
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < c.length; i++) {
-        if (c[i] == '-') {
-          // Skip the hyphen and capitalize the next character.
-          sb.append(Character.toUpperCase(c[++i]));
-        }
-        else
-          sb.append(c[i]);
-      }
-      
-      return sb.toString();
-    }
-
-    public String toString() {
-      Iterator<Entry<String, Xpp3Dom>> i = entrySet().iterator();
-
-      if (!i.hasNext())
-        return "";
-
-      StringBuilder sb = new StringBuilder();
-      for (;;) {
-        Entry<String, Xpp3Dom> e = i.next();
-        String key = e.getKey();
-        Xpp3Dom value = e.getValue();
-        sb.append('-' + key);
-        sb.append(' ');
-        sb.append(value.getValue());
-        if (!i.hasNext())
-          return sb.toString();
-        sb.append(' ');
-      }
-
-    }
   }
 
 }
