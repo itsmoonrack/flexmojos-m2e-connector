@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.internal.project;
+package net.flexmojos.m2e.project.fb47_;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;

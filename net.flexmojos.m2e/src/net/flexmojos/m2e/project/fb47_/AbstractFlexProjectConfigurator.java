@@ -1,6 +1,5 @@
-package net.flexmojos.m2e.internal.configurator;
+package net.flexmojos.m2e.project.fb47_;
 
-import net.flexmojos.m2e.internal.project.IProjectManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;

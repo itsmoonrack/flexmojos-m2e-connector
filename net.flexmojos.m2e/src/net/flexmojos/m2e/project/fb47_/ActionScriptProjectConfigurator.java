@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.internal.configurator;
+package net.flexmojos.m2e.project.fb47_;
 
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 
@@ -8,9 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.flexmojos.m2e.internal.flex.FlexCompilerArguments;
-import net.flexmojos.m2e.internal.flex.FlexFrameworkHelper;
-import net.flexmojos.m2e.internal.project.IProjectManager;
+import net.flexmojos.m2e.flex.FlexCompilerArguments;
+import net.flexmojos.m2e.flex.FlexFrameworkHelper;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
@@ -39,13 +38,14 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
   protected ActionScriptProjectConfigurator() {}
 
   @Inject
-  public ActionScriptProjectConfigurator(IMavenProjectFacade facade, IProgressMonitor monitor, IProjectManager manager) {
+  public ActionScriptProjectConfigurator(final IMavenProjectFacade facade, final IProgressMonitor monitor, final IProjectManager manager) {
     this.facade = facade;
     this.monitor = monitor;
     this.manager = manager;
-//    this.settings = manager.createFlexProjectDescription(facade.getProject(), false);
+    //    this.settings = manager.createFlexProjectDescription(facade.getProject(), false);
   }
 
+  @Override
   public void configure() throws CoreException {
     new ActionScriptProjectSettings(
         facade.getProject().getName(),
@@ -60,13 +60,13 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
   protected Artifact getFlexFrameworkArtifact() {
     return facade.getMavenProject().getArtifactMap().get("com.adobe.flex.framework:flex-framework");
   }
-  
+
   /**
    * @return Xpp3Dom
    *   Configuration.
    */
   protected Xpp3Dom getConfiguration() {
-    Map<String, Plugin> plugins = facade.getMavenProject().getBuild().getPluginsAsMap();
+    final Map<String, Plugin> plugins = facade.getMavenProject().getBuild().getPluginsAsMap();
     Plugin plugin = null;
 
     if (plugins.containsKey("net.flexmojos.oss:flexmojos-maven-plugin")) {
@@ -86,8 +86,8 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
    * Configures the main source folder.
    */
   protected void configureMainSourceFolder() {
-    Build build = facade.getMavenProject().getBuild();
-    IPath sourceDirectory = facade.getProjectRelativePath(build.getSourceDirectory());
+    final Build build = facade.getMavenProject().getBuild();
+    final IPath sourceDirectory = facade.getProjectRelativePath(build.getSourceDirectory());
     settings.setMainSourceFolder(sourceDirectory);
   }
 
@@ -97,14 +97,14 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
    * class path.
    */
   protected void configureSourcePath() {
-    List<IClassPathEntry> classPath = new ArrayList<IClassPathEntry>();
+    final List<IClassPathEntry> classPath = new ArrayList<IClassPathEntry>();
 
     // The test source directory is treated as a supplementary source path entry.
-    Build build = facade.getMavenProject().getBuild();
-    IPath testSourceDirectory = facade.getProjectRelativePath(build.getTestSourceDirectory());
+    final Build build = facade.getMavenProject().getBuild();
+    final IPath testSourceDirectory = facade.getProjectRelativePath(build.getTestSourceDirectory());
     classPath.add(ClassPathEntryFactory.newEntry(testSourceDirectory.toString(), settings));
 
-    IPath[] resources = facade.getResourceLocations();
+    final IPath[] resources = facade.getResourceLocations();
     for (int i = 0; i < resources.length; i++) {
       classPath.add(ClassPathEntryFactory.newEntry(resources[i].toString(), settings));
     }
@@ -118,9 +118,9 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
    * 
    * @param configuration
    */
-  protected void configureTargetPlayerVersion(Xpp3Dom configuration) {
-    Xpp3Dom targetPlayer = configuration.getChild("targetPlayer");
-    String formattedVersionString = (targetPlayer != null) ? targetPlayer.getValue() : "0.0.0";
+  protected void configureTargetPlayerVersion(final Xpp3Dom configuration) {
+    final Xpp3Dom targetPlayer = configuration.getChild("targetPlayer");
+    final String formattedVersionString = (targetPlayer != null) ? targetPlayer.getValue() : "0.0.0";
     settings.setTargetPlayerVersion(new FlashPlayerVersion(formattedVersionString));
   }
 
@@ -130,10 +130,10 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
    * 
    * @param configuration
    */
-  protected void configureMainApplicationPath(Xpp3Dom configuration) {
-    Xpp3Dom sourceFile = configuration.getChild("sourceFile");
+  protected void configureMainApplicationPath(final Xpp3Dom configuration) {
+    final Xpp3Dom sourceFile = configuration.getChild("sourceFile");
     if (sourceFile != null) {
-      IPath mainApplicationPath = new Path(sourceFile.getValue());
+      final IPath mainApplicationPath = new Path(sourceFile.getValue());
       settings.setApplicationPaths(new IPath[]{mainApplicationPath});
       settings.setMainApplicationPath(mainApplicationPath);
     }
@@ -147,7 +147,7 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
    * @param flexFramework
    */
   protected void configureFlexSDKName() {
-    Artifact flexFramework = getFlexFrameworkArtifact();
+    final Artifact flexFramework = getFlexFrameworkArtifact();
     settings.setFlexSDKName(FlexFrameworkHelper.getFlexSDKName(flexFramework.getVersion()));
   }
 
@@ -160,37 +160,40 @@ public class ActionScriptProjectConfigurator implements IProjectConfigurator {
    * @see configureFlexSDKName
    */
   protected void configureLibraryPath() {
-    List<IClassPathEntry> dependencies = new ArrayList<IClassPathEntry>(Arrays.asList(settings.getLibraryPath()));
-    for (Artifact dependency : facade.getMavenProject().getArtifacts()) {
+    final List<IClassPathEntry> dependencies = new ArrayList<IClassPathEntry>(Arrays.asList(settings.getLibraryPath()));
+    for (final Artifact dependency : facade.getMavenProject().getArtifacts()) {
       // Only manage SWC type dependencies.
       if (SWC.equals(dependency.getType())
           // TODO: Adds a better condition handling: isNotFlash|Flex|AirFramework.
           && !dependency.getGroupId().equals("com.adobe.air.framework")
           && !dependency.getGroupId().equals("com.adobe.flex.framework")
           && !dependency.getGroupId().equals("com.adobe.flash.framework")) {
-        String path  = dependency.getFile().getAbsolutePath();
+        final String path  = dependency.getFile().getAbsolutePath();
         dependencies.add(ClassPathEntryFactory.newEntry(IClassPathEntry.KIND_LIBRARY_FILE, path, settings));
       }
     }
     settings.setLibraryPath(dependencies.toArray(new IClassPathEntry[dependencies.size()]));
   }
 
-  protected void configureAdditionalCompilerArgs(Xpp3Dom configuration) {
-    FlexCompilerArguments arguments = new FlexCompilerArguments();
+  protected void configureAdditionalCompilerArgs(final Xpp3Dom configuration) {
+    final FlexCompilerArguments arguments = new FlexCompilerArguments();
 
     // Sets source-path argument.
-    List<String> pathElements = new LinkedList<String>();
-    Xpp3Dom resourceBundlePath = configuration.getChild("resourceBundlePath");
+    final List<String> pathElements = new LinkedList<String>();
+    final Xpp3Dom resourceBundlePath = configuration.getChild("resourceBundlePath");
     if (resourceBundlePath != null) {
       pathElements.add(facade.getProjectRelativePath(resourceBundlePath.getValue()).toString());
+    }
+    else {
+
     }
     arguments.setSourcePath(pathElements);
 
     // Sets locale argument.
-    List<String> locales = new LinkedList<String>();
-    Xpp3Dom localesCompiled = configuration.getChild("localesCompiled");
+    final List<String> locales = new LinkedList<String>();
+    final Xpp3Dom localesCompiled = configuration.getChild("localesCompiled");
     if (localesCompiled != null) {
-      for (Xpp3Dom locale : localesCompiled.getChildren()) {
+      for (final Xpp3Dom locale : localesCompiled.getChildren()) {
         locales.add(locale.getValue());
       }
     }

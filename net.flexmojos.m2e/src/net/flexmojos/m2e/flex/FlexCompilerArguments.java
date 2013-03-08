@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.internal.flex;
+package net.flexmojos.m2e.flex;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +58,6 @@ public class FlexCompilerArguments {
   }
 
   public String toString() {
-    return implode(" ", arguments);
+    return arguments.size() == 0 ? "" : implode(" ", arguments);
   }
 }

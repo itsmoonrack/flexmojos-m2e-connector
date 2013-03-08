@@ -6,9 +6,7 @@ import static net.flexmojos.oss.plugin.common.FlexExtension.SWF;
 
 import java.util.Arrays;
 
-import net.flexmojos.m2e.internal.FlashBuilderModule;
-import net.flexmojos.m2e.internal.configurator.IProjectConfigurator;
-import net.flexmojos.m2e.internal.project.FB47ProjectManager;
+import net.flexmojos.m2e.project.AbstractConfigurator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -27,26 +25,40 @@ import com.google.inject.Injector;
  */
 public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator {
 
+
+  public FlashBuilderProjectConfigurator() {
+    //    int major = 0, minor = 0;
+    //
+    //    try {
+    //      major = com.adobe.flexbuilder.project.FlexProjectConstants.AMT_FB4_MAJOR_VERSION;
+    //      minor = com.adobe.flexbuilder.project.FlexProjectConstants.AMT_FB4_MINOR_VERSION;
+    //    }
+    //    catch (final Exception e) {
+    //
+    //    }
+  }
+
   /**
    * Adds the Flash/Flex/Air nature to projects qualified as Flash Builder compatible, i.e,
    * having a packaging of type "swc", "swf", or "air" in their pom.xml file.
    * 
    * The configurator looks through the declared dependencies of the pom.xml file to infers the project type.
    */
-  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    IMavenProjectFacade facade = request.getMavenProjectFacade();
+  @Override
+  public void configure(final ProjectConfigurationRequest request, final IProgressMonitor monitor) throws CoreException {
+    final IMavenProjectFacade facade = request.getMavenProjectFacade();
     if (!isQualifiedAsFlashBuilderProject(facade)) {
       return;
     }
 
-    // Creates the project configurator through the FlashBuilder47Module.
-    Injector injector = Guice.createInjector(new FlashBuilderModule(facade, monitor, FB47ProjectManager.class));
-    IProjectConfigurator configurator = injector.getInstance(IProjectConfigurator.class);
+    // Creates the project configurator through the FlashBuilderModule.
+    final Injector injector = Guice.createInjector(new FlashBuilder47Module(request, monitor));
+    final AbstractConfigurator configurator = injector.getInstance(AbstractConfigurator.class);
 
     configurator.configure();
   }
 
-  private boolean isQualifiedAsFlashBuilderProject(IMavenProjectFacade facade) {
+  private boolean isQualifiedAsFlashBuilderProject(final IMavenProjectFacade facade) {
     return Arrays.asList(new String[]{AIR, SWC, SWF}).contains(facade.getPackaging());
   }
 

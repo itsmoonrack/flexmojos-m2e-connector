@@ -1,7 +1,8 @@
-package net.flexmojos.m2e.internal.project;
+package net.flexmojos.m2e.project.fb47_;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -25,10 +26,8 @@ public class FB47ProjectManager implements IProjectManager {
 
   private static class FlexProxyAdapter extends AbstractProxyAdapter implements InvocationHandler {
 
-    public FlexProxyAdapter(IProject project, boolean overrideHTMLWrapperDefault) {
+    public FlexProxyAdapter(final IProject project, final boolean overrideHTMLWrapperDefault) {
       this.project = project;
-//      int major = com.adobe.flexbuilder.project.FlexProjectConstants.AMT_FB4_MAJOR_VERSION;
-//      int minor = com.adobe.flexbuilder.project.FlexProjectConstants.AMT_FB4_MINOR_VERSION;
       this.settings = FlexProjectManager.createFlexProjectDescription(
           project.getName(),
           project.getLocation(),
@@ -37,8 +36,8 @@ public class FB47ProjectManager implements IProjectManager {
     }
 
     @Override
-    public void saveDescription(IProject project, IProgressMonitor monitor) throws CoreException {
-      FlexProjectSettings flexProjectSettings = (FlexProjectSettings) settings;
+    public void saveDescription(final IProject project, final IProgressMonitor monitor) throws CoreException {
+      final FlexProjectSettings flexProjectSettings = (FlexProjectSettings) settings;
       flexProjectSettings.saveDescription(project, monitor);
     }
 
@@ -48,7 +47,7 @@ public class FB47ProjectManager implements IProjectManager {
    * @see net.flexmojos.m2e.internal.IProjectManager#createFlexProjectDescription(org.eclipse.core.resources.IProject, boolean)
    */
   @Override
-  public IMutableFlexProjectSettings createFlexProjectDescription(IProject project, boolean overrideHTMLWrapperDefault) {
+  public IMutableFlexProjectSettings createFlexProjectDescription(final IProject project, final boolean overrideHTMLWrapperDefault) {
     return (IMutableFlexProjectSettings) Proxy.newProxyInstance(
         FB47ProjectManager.class.getClassLoader(),
         new Class[] {IMutableFlexProjectSettings.class},
@@ -59,8 +58,8 @@ public class FB47ProjectManager implements IProjectManager {
    * @see net.flexmojos.m2e.internal.IProjectManager#saveDescription(org.eclipse.core.resources.IProject, com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings, org.eclipse.core.runtime.IProgressMonitor)
    */
   @Override
-  public void saveDescription(IProject project, IMutableActionScriptProjectSettings settings, IProgressMonitor monitor) throws CoreException {
-    AbstractProxyAdapter abstractProxyAdapter = ((AbstractProxyAdapter)Proxy.getInvocationHandler(settings));
+  public void saveDescription(final IProject project, final IMutableActionScriptProjectSettings settings, final IProgressMonitor monitor) throws CoreException {
+    final AbstractProxyAdapter abstractProxyAdapter = ((AbstractProxyAdapter)Proxy.getInvocationHandler(settings));
     abstractProxyAdapter.saveDescription(project, monitor);
   }
 

@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.internal.flex;
+package net.flexmojos.m2e.flex;
 
 public class FlexFrameworkHelper {
 

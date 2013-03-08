@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.internal.project;
+package net.flexmojos.m2e.project.fb47_;
 
 import java.lang.reflect.Method;
 

@@ -1,6 +1,5 @@
-package net.flexmojos.m2e.internal.configurator;
+package net.flexmojos.m2e.project.fb47_;
 
-import net.flexmojos.m2e.internal.project.IProjectManager;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IProject;

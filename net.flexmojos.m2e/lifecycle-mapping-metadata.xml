@@ -3,6 +3,7 @@
 <lifecycleMappingMetadata>
 
   <pluginExecutions>
+
     <pluginExecution>
       <pluginExecutionFilter>
         <groupId>net.flexmojos.oss</groupId>
@@ -20,6 +21,7 @@
         </configurator>
       </action>
     </pluginExecution>
+
   </pluginExecutions>
 
 </lifecycleMappingMetadata>
