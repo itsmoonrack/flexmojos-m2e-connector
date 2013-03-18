@@ -2,14 +2,16 @@ package net.flexmojos.m2e.project.fb47;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import net.flexmojos.m2e.flex.FlexCompilerArguments;
-import net.flexmojos.m2e.flex.FlexFrameworkHelper;
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
 import net.flexmojos.m2e.project.AbstractConfigurator;
 
+import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -47,41 +49,32 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator {
   public void saveDescription() {
   }
 
-  /**
-   * Transforms IPath[] to IClassPathEntry[] array.
-   * 
-   * @param path
-   * @return
-   */
-  protected IClassPathEntry[] transformIPath(final IPath[] path) {
-    final IClassPathEntry[] classPath = new IClassPathEntry[path.length];
-
-    for (int i = 0; i < path.length; i++)
-      // Converts IPath to IClassPathEntry.
-      classPath[i] = ClassPathEntryFactory.newEntry(path[i].toString(), settings);
-
-    return classPath;
-  }
-
   @Override
-  public void configureMainSourceFolder() {
+  protected void configureMainSourceFolder() {
     settings.setMainSourceFolder(plugin.getMainSourceFolder());
   }
 
   @Override
-  public void configureSourcePath() {
-    settings.setSourcePath(transformIPath(plugin.getSourcePath()));
+  protected void configureSourcePath() {
+    final IPath[] paths = plugin.getSourcePath();
+    final IClassPathEntry[] classPath = new IClassPathEntry[paths.length];
+
+    for (int i = 0; i < paths.length; i++)
+      // Converts IPath to IClassPathEntry.
+      classPath[i] = ClassPathEntryFactory.newEntry(paths[i].toString(), settings);
+
+    settings.setSourcePath(classPath);
   }
 
   @Override
-  public void configureTargetPlayerVersion() {
+  protected void configureTargetPlayerVersion() {
     final String playerBinary = plugin.getTargetPlayerVersion();
     final FlashPlayerVersion version = new FlashPlayerVersion(playerBinary == null ? "0.0.0" : playerBinary);
     settings.setTargetPlayerVersion(version);
   }
 
   @Override
-  public void configureMainApplicationPath() {
+  protected void configureMainApplicationPath() {
     final IPath mainApplicationPath = plugin.getMainApplicationPath();
     if (mainApplicationPath != null) {
       settings.setApplicationPaths(new IPath[]{mainApplicationPath});
@@ -90,22 +83,36 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator {
   }
 
   @Override
-  public void configureFlexSDKName() {
-    final String flexVersion = plugin.getFlexFrameworkArtifact().getVersion();
-    final String flexSDKName = FlexFrameworkHelper.getFlexSDKName(flexVersion);
-    settings.setFlexSDKName(flexSDKName);
+  protected void configureLibraryPath() {
+    final Map<String, Artifact> dependencies = plugin.getDependencies();
+    final Map<String, IClassPathEntry> classPath = new LinkedHashMap<String, IClassPathEntry>();
+
+    for (final IClassPathEntry entry : settings.getLibraryPath()) {
+      // Copy previous library path that exists in project's dependencies.
+      if (dependencies.containsKey(entry.getValue()))
+        classPath.put(entry.getValue(), entry);
+
+      // Copy Flex dependency.
+      else if (entry instanceof ClassPathEntryFactory.FlexSDKClasspathEntry)
+        classPath.put("flex-framework", entry);
+    }
+
+    for (final Artifact artifact : dependencies.values()) {
+      // Copy dependencies to new class path.
+      final String path = artifact.getFile().getAbsolutePath();
+      final String scope = artifact.getScope();
+      final IClassPathEntry entry = ClassPathEntryFactory.newEntry(IClassPathEntry.KIND_LIBRARY_FILE, path, settings);
+
+      if (!scope.equals("test"))
+        // Adds entry to class path.
+        classPath.put(path, entry);
+    }
+
+    settings.setLibraryPath(classPath.values().toArray(new IClassPathEntry[classPath.size()]));
   }
 
   @Override
-  public void configureLibraryPath() {
-    // Gets the Flex SDK dependency added by configureFlexSDKName().
-    final List<IClassPathEntry> dependencies = new ArrayList<IClassPathEntry>(Arrays.asList(settings.getLibraryPath()));
-    dependencies.addAll(Arrays.asList(transformIPath(plugin.getLibraryPath())));
-    settings.setLibraryPath(dependencies.toArray(new IClassPathEntry[dependencies.size()]));
-  }
-
-  @Override
-  public void configureAdditionalCompilerArgs() {
+  protected void configureAdditionalCompilerArgs() {
     final FlexCompilerArguments arguments = new FlexCompilerArguments();
 
     // Sets source-path argument.

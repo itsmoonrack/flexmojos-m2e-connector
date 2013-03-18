@@ -1,5 +1,7 @@
 package net.flexmojos.m2e.maven;
 
+import java.util.Map;
+
 import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.runtime.IPath;
 
@@ -20,7 +22,7 @@ public interface IMavenFlexPlugin {
   /**
    * Gets Flex Framework artifact.
    */
-  Artifact getFlexFrameworkArtifact();
+  Artifact getFlexFramework();
 
   /**
    * Gets the source path so the testSourceDirectory, and additional
@@ -40,9 +42,9 @@ public interface IMavenFlexPlugin {
   IPath getMainApplicationPath();
 
   /**
-   * Gets the library path by adding Maven's SWC dependencies of the project.
+   * Gets the artifacts by adding Maven's SWC dependencies of the project.
    */
-  IPath[] getLibraryPath();
+  Map<String, Artifact> getDependencies();
 
   /**
    * Gets the locale source path.

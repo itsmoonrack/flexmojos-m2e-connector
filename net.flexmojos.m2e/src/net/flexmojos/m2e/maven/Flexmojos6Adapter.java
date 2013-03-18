@@ -4,6 +4,7 @@ import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class Flexmojos6Adapter implements IMavenFlexPlugin {
   }
 
   @Override
-  public Artifact getFlexFrameworkArtifact() {
+  public Artifact getFlexFramework() {
     final Map<String, Artifact> artifacts = facade.getMavenProject().getArtifactMap();
 
     // Checks an Apache Flex Framework artifact exists.
@@ -101,21 +102,20 @@ public class Flexmojos6Adapter implements IMavenFlexPlugin {
   }
 
   @Override
-  public IPath[] getLibraryPath() {
-    final List<IPath> dependencies = new ArrayList<IPath>();
+  public Map<String, Artifact> getDependencies() {
+    final Map<String, Artifact> dependencies = new LinkedHashMap<String, Artifact>();
 
-    for (final Artifact dependency : facade.getMavenProject().getArtifacts()) {
+    for (final Artifact artifact : facade.getMavenProject().getArtifacts()) {
       // Only manage SWC type dependencies.
-      if (SWC.equals(dependency.getType())
-          // TODO: Adds a better condition handling: isNotFlash|Flex|AirFramework.
-          && !dependency.getGroupId().equals("com.adobe.air.framework")
-          && !dependency.getGroupId().equals("com.adobe.flex.framework")
-          && !dependency.getGroupId().equals("com.adobe.flash.framework")) {
-        dependencies.add(new Path(dependency.getFile().getAbsolutePath()));
+      if (SWC.equals(artifact.getType())
+          && !isAirFramework(artifact)
+          && !isFlashFramework(artifact)
+          && !isFlexFramework(artifact)) {
+        dependencies.put(artifact.getFile().getAbsolutePath(), artifact);
       }
     }
 
-    return dependencies.toArray(new IPath[dependencies.size()]);
+    return dependencies;
   }
 
   @Override
@@ -134,6 +134,40 @@ public class Flexmojos6Adapter implements IMavenFlexPlugin {
     }
 
     return locales;
+  }
+
+  /**
+   * Returns <tt>true</tt> if this artifact belongs to Air Framework.
+   *
+   * @param artifact The artifact to test.
+   * 
+   * @return <tt>true</tt> if this artifact belongs to Air Framework.
+   */
+  protected boolean isAirFramework(final Artifact artifact) {
+    return artifact.getGroupId().startsWith("com.adobe.air.framework");
+  }
+
+  /**
+   * Returns <tt>true</tt> if this artifact belongs to Flash Framework.
+   *
+   * @param artifact The artifact to test.
+   * 
+   * @return <tt>true</tt> if this artifact belongs to Flash Framework.
+   */
+  protected boolean isFlashFramework(final Artifact artifact) {
+    return artifact.getGroupId().startsWith("com.adobe.flash.framework");
+  }
+
+  /**
+   * Returns <tt>true</tt> if this artifact belongs to Flex Framework.
+   *
+   * @param artifact The artifact to test.
+   * 
+   * @return <tt>true</tt> if this artifact belongs to Flex Framework.
+   */
+  protected boolean isFlexFramework(final Artifact artifact) {
+    return artifact.getGroupId().startsWith("com.adobe.flex.framework")
+        || artifact.getGroupId().startsWith("org.apache.flex.framework");
   }
 
 }

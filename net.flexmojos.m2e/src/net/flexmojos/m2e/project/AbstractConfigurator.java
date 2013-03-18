@@ -22,14 +22,14 @@ public abstract class AbstractConfigurator {
   /**
    * Configures the main source folder.
    */
-  public abstract void configureMainSourceFolder();
+  protected abstract void configureMainSourceFolder();
 
   /**
    * Configures the source path so the testSourceDirectory, and additional
    * resources locations such as default src/main/resources are added to the
    * class path.
    */
-  public abstract void configureSourcePath();
+  protected abstract void configureSourcePath();
 
   /**
    * Configures the target player version, if no version is found, pass the
@@ -38,35 +38,23 @@ public abstract class AbstractConfigurator {
    * 
    * @param configuration
    */
-  public abstract void configureTargetPlayerVersion();
+  protected abstract void configureTargetPlayerVersion();
 
   /**
    * Configures the main application path, if no source file is found, use the
    * default which is inferred from project's name.
    */
-  public abstract void configureMainApplicationPath();
-
-
-  /**
-   * Configures the Flex SDK name and adds it to the library path of the project.
-   * 
-   * Must be called before configuring the library path.
-   */
-  public abstract void configureFlexSDKName();
+  protected abstract void configureMainApplicationPath();
 
   /**
    * Configures the library path by adding Maven's SWC dependencies of the project.
-   * 
-   * Must be called after configured the Flex SDK name.
-   * 
-   * @see configureFlexSDKName
    */
-  public abstract void configureLibraryPath();
+  protected abstract void configureLibraryPath();
 
   /**
    * Configure the additional compiler arguments.
    */
-  public abstract void configureAdditionalCompilerArgs();
+  protected abstract void configureAdditionalCompilerArgs();
 
   /**
    * Configures the project.
@@ -74,9 +62,7 @@ public abstract class AbstractConfigurator {
   public void configure() {
     configureMainSourceFolder();
     configureSourcePath();
-    configureFlexSDKName();
     configureLibraryPath();
-
 
     configureTargetPlayerVersion();
     configureMainApplicationPath();
