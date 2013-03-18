@@ -56,6 +56,7 @@ public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
     final AbstractConfigurator configurator = injector.getInstance(AbstractConfigurator.class);
 
     configurator.configure();
+    configurator.saveDescription();
   }
 
   private boolean isQualifiedAsFlashBuilderProject(final IMavenProjectFacade facade) {

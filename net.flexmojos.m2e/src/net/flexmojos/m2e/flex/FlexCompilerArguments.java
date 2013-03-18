@@ -3,6 +3,8 @@ package net.flexmojos.m2e.flex;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
  * Mxmlc compiler specifications.
  * 
@@ -22,9 +24,9 @@ public class FlexCompilerArguments {
    * 
    * @param resourceBundlePath
    */
-  public void setSourcePath(List<String> pathElements) {
+  public void setSourcePath(final List<String> pathElements) {
     if (pathElements.size() != 0) {
-      arguments.add("-source-path=" + implode(" ", pathElements));
+      arguments.add("-source-path=" + StringUtils.join(pathElements.iterator(), " "));
     }
   }
 
@@ -34,30 +36,14 @@ public class FlexCompilerArguments {
    * 
    * @param localesCompiled
    */
-  public void setLocalesCompiled(List<String> locales) {
+  public void setLocalesCompiled(final List<String> locales) {
     if (locales.size() != 0) {
-      arguments.add("-locale=" + implode(",", locales));
+      arguments.add("-locale=" + StringUtils.join(locales.iterator(), ","));
     }
   }
 
-  /**
-   * Join array elements with a string.
-   * 
-   * @param glue
-   * @param pieces
-   */
-  private String implode(String glue, List<String> pieces) {
-    StringBuilder builder = new StringBuilder();
-
-    builder.append(pieces.remove(0));
-    for (String piece : pieces) {
-      builder.append(glue + piece);
-    }
-
-    return builder.toString();
-  }
-
+  @Override
   public String toString() {
-    return arguments.size() == 0 ? "" : implode(" ", arguments);
+    return arguments.size() == 0 ? "" : StringUtils.join(arguments.iterator(), " ");
   }
 }

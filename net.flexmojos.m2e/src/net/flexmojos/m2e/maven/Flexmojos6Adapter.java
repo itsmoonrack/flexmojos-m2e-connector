@@ -103,6 +103,7 @@ public class Flexmojos6Adapter implements IMavenFlexPlugin {
   @Override
   public IPath[] getLibraryPath() {
     final List<IPath> dependencies = new ArrayList<IPath>();
+
     for (final Artifact dependency : facade.getMavenProject().getArtifacts()) {
       // Only manage SWC type dependencies.
       if (SWC.equals(dependency.getType())
@@ -110,10 +111,10 @@ public class Flexmojos6Adapter implements IMavenFlexPlugin {
           && !dependency.getGroupId().equals("com.adobe.air.framework")
           && !dependency.getGroupId().equals("com.adobe.flex.framework")
           && !dependency.getGroupId().equals("com.adobe.flash.framework")) {
-        final String fullPath  = dependency.getFile().getAbsolutePath();
-        dependencies.add(new Path(fullPath));
+        dependencies.add(new Path(dependency.getFile().getAbsolutePath()));
       }
     }
+
     return dependencies.toArray(new IPath[dependencies.size()]);
   }
 
@@ -125,9 +126,14 @@ public class Flexmojos6Adapter implements IMavenFlexPlugin {
 
   @Override
   public String[] getLocalesCompiled() {
-    final String[] localesCompiled = new String[configuration.getChild("localesCompiled").getChildCount()];
-    // TODO Auto-generated method stub
-    return null;
+    final Xpp3Dom localesCompiled = configuration.getChild("localesCompiled");
+    final String[] locales = new String[localesCompiled.getChildCount()];
+
+    for (int i = 0; i < localesCompiled.getChildCount(); i++) {
+      locales[i] = localesCompiled.getChild(i).getValue();
+    }
+
+    return locales;
   }
 
 }

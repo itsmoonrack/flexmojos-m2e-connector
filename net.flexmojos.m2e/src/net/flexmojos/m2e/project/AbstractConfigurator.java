@@ -63,6 +63,9 @@ public abstract class AbstractConfigurator {
    */
   public abstract void configureLibraryPath();
 
+  /**
+   * Configure the additional compiler arguments.
+   */
   public abstract void configureAdditionalCompilerArgs();
 
   /**
@@ -79,5 +82,10 @@ public abstract class AbstractConfigurator {
     configureMainApplicationPath();
     configureAdditionalCompilerArgs();
   }
+
+  /**
+   * Saves the project description.
+   */
+  public abstract void saveDescription();
 
 }
