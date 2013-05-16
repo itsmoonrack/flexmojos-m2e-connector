@@ -19,7 +19,6 @@ package net.flexmojos.oss.plugin.common;
 
 public interface FlexScopes
 {
-
     String COMPILE = "compile";
 
     String EXTERNAL = "external";

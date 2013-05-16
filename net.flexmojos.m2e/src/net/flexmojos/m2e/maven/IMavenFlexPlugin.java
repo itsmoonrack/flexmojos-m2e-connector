@@ -9,6 +9,7 @@ import com.adobe.flexbuilder.project.XMLNamespaceManifestPath;
 
 /**
  * Defines the interface for implementation classes.
+ * 
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  */
 public interface IMavenFlexPlugin
@@ -39,7 +40,7 @@ public interface IMavenFlexPlugin
      * Gets the main application path.
      */
     IPath getMainApplicationPath();
-    
+
     /**
      * Gets the output folder path.
      */

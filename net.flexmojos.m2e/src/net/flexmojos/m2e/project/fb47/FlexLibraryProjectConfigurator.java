@@ -14,22 +14,22 @@ public class FlexLibraryProjectConfigurator
     extends AbstractFlexProjectConfigurator
 {
 
-    protected FlexLibraryProjectConfigurator(final IMavenFlexPlugin plugin)
+    protected FlexLibraryProjectConfigurator( final IMavenFlexPlugin plugin )
     {
-        super(plugin);
+        super( plugin );
     }
 
     @Inject
-    public FlexLibraryProjectConfigurator(final IMavenProjectFacade facade, final IProgressMonitor monitor,
-        final IMavenFlexPlugin plugin)
+    public FlexLibraryProjectConfigurator( final IMavenProjectFacade facade, final IProgressMonitor monitor,
+                                           final IMavenFlexPlugin plugin )
     {
-        super(plugin);
+        super( plugin );
         this.monitor = monitor;
         project = facade.getProject();
 
-        final IFlexLibraryProject flexProject = (IFlexLibraryProject) FlexProjectManager.getFlexProject(project);
+        final IFlexLibraryProject flexProject = (IFlexLibraryProject) FlexProjectManager.getFlexProject( project );
         // Checks if project already exists.
-        if (flexProject != null)
+        if ( flexProject != null )
         {
             // If it does, reuse the settings.
             settings = flexProject.getFlexLibraryProjectSettingsClone();
@@ -38,8 +38,14 @@ public class FlexLibraryProjectConfigurator
         {
             // If it does not, create new settings.
             settings =
-                FlexProjectManager
-                    .createFlexLibraryProjectDescription(project.getName(), project.getLocation(), false /* FIXME: hard-coded! */);
+                FlexProjectManager.createFlexLibraryProjectDescription( project.getName(), project.getLocation(), false /*
+                                                                                                                         * FIXME
+                                                                                                                         * :
+                                                                                                                         * hard
+                                                                                                                         * -
+                                                                                                                         * coded
+                                                                                                                         * !
+                                                                                                                         */);
         }
     }
 
@@ -47,7 +53,7 @@ public class FlexLibraryProjectConfigurator
     public void saveDescription()
     {
         final FlexLibraryProjectSettings flexProjectSettings = (FlexLibraryProjectSettings) settings;
-        flexProjectSettings.saveDescription(project, monitor);
+        flexProjectSettings.saveDescription( project, monitor );
     }
 
     @Override
@@ -60,7 +66,7 @@ public class FlexLibraryProjectConfigurator
     protected void configureManifest()
     {
         final FlexLibraryProjectSettings flexProjectSettings = (FlexLibraryProjectSettings) settings;
-        flexProjectSettings.setManifestPaths(plugin.getXMLNamespaceManifestPath());
+        flexProjectSettings.setManifestPaths( plugin.getXMLNamespaceManifestPath() );
     }
 
     @Override

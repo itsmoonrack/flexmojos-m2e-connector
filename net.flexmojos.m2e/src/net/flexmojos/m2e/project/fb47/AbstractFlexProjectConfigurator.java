@@ -12,16 +12,16 @@ public abstract class AbstractFlexProjectConfigurator
     extends ActionScriptProjectConfigurator
 {
 
-    protected AbstractFlexProjectConfigurator(final IMavenFlexPlugin plugin)
+    protected AbstractFlexProjectConfigurator( final IMavenFlexPlugin plugin )
     {
-        super(plugin);
+        super( plugin );
     }
 
     @Inject
-    public AbstractFlexProjectConfigurator(final IMavenProjectFacade facade, final IProgressMonitor monitor,
-        final IMavenFlexPlugin plugin)
+    public AbstractFlexProjectConfigurator( final IMavenProjectFacade facade, final IProgressMonitor monitor,
+                                            final IMavenFlexPlugin plugin )
     {
-        super(facade, monitor, plugin);
+        super( facade, monitor, plugin );
     }
 
     /**
@@ -31,7 +31,7 @@ public abstract class AbstractFlexProjectConfigurator
     protected void configureFlexSDKName()
     {
         final String flexVersion = plugin.getFlexFramework().getVersion();
-        final String flexSDKName = FlexFrameworkHelper.getFlexSDKName(flexVersion);
-        settings.setFlexSDKName(flexSDKName);
+        final String flexSDKName = FlexFrameworkHelper.getFlexSDKName( flexVersion );
+        settings.setFlexSDKName( flexSDKName );
     }
 }

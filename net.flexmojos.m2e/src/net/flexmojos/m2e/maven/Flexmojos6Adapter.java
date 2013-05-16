@@ -27,7 +27,6 @@ import com.google.inject.Inject;
 public class Flexmojos6Adapter
     implements IMavenFlexPlugin
 {
-
     protected IMavenProjectFacade facade;
 
     protected IProgressMonitor monitor;
@@ -37,29 +36,30 @@ public class Flexmojos6Adapter
     protected Xpp3Dom configuration;
 
     @Inject
-    public Flexmojos6Adapter(final IMavenProjectFacade facade, final IProgressMonitor monitor,
-        final MavenSession session, final MojoExecution mojo)
+    public Flexmojos6Adapter( final IMavenProjectFacade facade, final IProgressMonitor monitor,
+                              final MavenSession session, final MojoExecution mojo )
     {
         this.facade = facade;
         this.monitor = monitor;
-        evaluator = new PluginParameterExpressionEvaluator(session, mojo);
+        evaluator = new PluginParameterExpressionEvaluator( session, mojo );
         configuration = mojo.getConfiguration();
     }
 
     /**
      * Short-hand method for evaluating a configuration value.
+     * 
      * @return
      */
-    protected String evaluate(final Xpp3Dom conf)
+    protected String evaluate( final Xpp3Dom conf )
     {
         try
         {
-            if (conf.getValue() != null)
-                return (String) evaluator.evaluate(conf.getValue());
+            if ( conf.getValue() != null )
+                return (String) evaluator.evaluate( conf.getValue() );
             else
-                return (String) evaluator.evaluate(conf.getAttribute("default-value"));
+                return (String) evaluator.evaluate( conf.getAttribute( "default-value" ) );
         }
-        catch (final Exception e)
+        catch ( final Exception e )
         {
             return null;
         }
@@ -69,7 +69,7 @@ public class Flexmojos6Adapter
     public IPath getMainSourceFolder()
     {
         final Build build = facade.getMavenProject().getBuild();
-        return facade.getProjectRelativePath(build.getSourceDirectory());
+        return facade.getProjectRelativePath( build.getSourceDirectory() );
     }
 
     @Override
@@ -78,44 +78,55 @@ public class Flexmojos6Adapter
         final Map<String, Artifact> artifacts = facade.getMavenProject().getArtifactMap();
 
         // Checks an Apache Flex Framework artifact exists.
-        if (artifacts.containsKey("org.apache.flex.framework:flex-framework"))
-            // If it does, return the instance of Apache Flex framework artifact.
-            return artifacts.get("org.apache.flex.framework:flex-framework");
+        if ( artifacts.containsKey( "org.apache.flex.framework:flex-framework" ) )
+            // If it does, return the instance of Apache Flex framework
+            // artifact.
+            return artifacts.get( "org.apache.flex.framework:flex-framework" );
 
         // Checks an Adobe Flex Framework artifact exists.
-        if (artifacts.containsKey("com.adobe.flex.framework:flex-framework"))
+        if ( artifacts.containsKey( "org.apache.flex.framework:flex-framework" ) )
             // If it does, return the instance of Adobe Flex Framework artifact.
-            return artifacts.get("com.adobe.flex.framework:flex-framework");
+            return artifacts.get( "com.adobe.flex.framework:flex-framework" );
+
+        if ( artifacts.containsKey( "org.apache.flex.framework.air:air-framework" ) )
+            // If it does, return the instance of Adobe Flex AIR Framework artifact.
+            return artifacts.get( "org.apache.flex.framework.air:air-framework" );
+
+        if ( artifacts.containsKey( "com.adobe.flex.framework.air:air-framework" ) )
+            // If it does, return the instance of Adobe Flex AIR Framework artifact.
+            return artifacts.get( "com.adobe.flex.framework.air:air-framework" );
 
         // Inform user that Flex Framework artifact could not be found.
-        throw new RuntimeException("Flex Framework not found in project's artifacts.");
+        throw new RuntimeException( "Flex Framework not found in project's artifacts." );
     }
 
     @Override
     public IPath[] getSourcePath()
     {
-        final List<IPath> classPath = new ArrayList<IPath>(Arrays.asList(facade.getResourceLocations()));
-
-        // The test source directory is treated as a supplementary source path entry.
+        final List<IPath> classPath = new ArrayList<IPath>( Arrays.asList( facade.getResourceLocations() ) );
+        // The test source directory is treated as a supplementary source path
+        // entry.
         final Build build = facade.getMavenProject().getBuild();
-        final IPath testSourceDirectory = facade.getProjectRelativePath(build.getTestSourceDirectory());
+        final IPath testSourceDirectory = facade.getProjectRelativePath( build.getTestSourceDirectory() );
+        if ( testSourceDirectory.toFile().exists() )
+        {
+            classPath.add( testSourceDirectory );
+        }
 
-        classPath.add(testSourceDirectory);
-
-        return classPath.toArray(new IPath[classPath.size()]);
+        return classPath.toArray( new IPath[classPath.size()] );
     }
 
     @Override
     public String getTargetPlayerVersion()
     {
-        return evaluate(configuration.getChild("targetPlayer"));
+        return evaluate( configuration.getChild( "targetPlayer" ) );
     }
 
     @Override
     public IPath getMainApplicationPath()
     {
-        final String sourceFile = evaluate(configuration.getChild("sourceFile"));
-        return sourceFile == null ? null : new Path(sourceFile);
+        final String sourceFile = evaluate( configuration.getChild( "sourceFile" ) );
+        return sourceFile == null ? null : new Path( sourceFile );
     }
 
     @Override
@@ -123,13 +134,13 @@ public class Flexmojos6Adapter
     {
         final Map<String, Artifact> dependencies = new LinkedHashMap<String, Artifact>();
 
-        for (final Artifact artifact : facade.getMavenProject().getArtifacts())
+        for ( final Artifact artifact : facade.getMavenProject().getArtifacts() )
         {
             // Only manage SWC type dependencies.
-            if (SWC.equals(artifact.getType()) && !isAirFramework(artifact) && !isFlashFramework(artifact)
-                && !isFlexFramework(artifact))
+            if ( SWC.equals( artifact.getType() ) && !isAirFramework( artifact ) && !isFlashFramework( artifact )
+                && !isFlexFramework( artifact ) )
             {
-                dependencies.put(artifact.getFile().getAbsolutePath(), artifact);
+                dependencies.put( artifact.getFile().getAbsolutePath(), artifact );
             }
         }
 
@@ -139,75 +150,96 @@ public class Flexmojos6Adapter
     @Override
     public IPath getLocalesSourcePath()
     {
-        final String localesSourcePath = evaluate(configuration.getChild("localesSourcePath"));
-        return facade.getProjectRelativePath(localesSourcePath);
+        final String localesSourcePath = evaluate( configuration.getChild( "localesSourcePath" ) );
+        final IPath path = facade.getProjectRelativePath( localesSourcePath );
+        if ( path.toFile().exists() )
+            return facade.getProjectRelativePath( localesSourcePath );
+        else
+            return null;
     }
 
     @Override
     public String[] getLocalesCompiled()
     {
-        final Xpp3Dom localesCompiled = configuration.getChild("localesCompiled");
-        final String[] locales = new String[localesCompiled.getChildCount()];
-
-        for (int i = 0; i < localesCompiled.getChildCount(); i++)
+        final Xpp3Dom localesCompiled = configuration.getChild( "localesCompiled" );
+        if ( localesCompiled != null )
         {
-            locales[i] = localesCompiled.getChild(i).getValue();
-        }
+            final String[] locales = new String[localesCompiled.getChildCount()];
 
-        return locales;
+            for ( int i = 0; i < localesCompiled.getChildCount(); i++ )
+            {
+                locales[i] = localesCompiled.getChild( i ).getValue();
+            }
+
+            return locales;
+        }
+        else
+        {
+            return new String[0];
+        }
     }
 
     @Override
     public XMLNamespaceManifestPath[] getXMLNamespaceManifestPath()
     {
-        final Xpp3Dom namespacesTag = configuration.getChild("namespaces");
-        final XMLNamespaceManifestPath[] namespaces = new XMLNamespaceManifestPath[namespacesTag.getChildCount()];
-
-        for (int i = 0; i < namespacesTag.getChildCount(); i++)
+        final Xpp3Dom namespacesTag = configuration.getChild( "namespaces" );
+        if ( namespacesTag != null )
         {
-            namespaces[i] =
-                new XMLNamespaceManifestPath(namespacesTag.getChild(i).getChild("uri").getValue(),
-                    facade.getFullPath(new File(namespacesTag.getChild(i).getChild("manifest").getValue())));
+            final XMLNamespaceManifestPath[] namespaces = new XMLNamespaceManifestPath[namespacesTag.getChildCount()];
+            for ( int i = 0; i < namespacesTag.getChildCount(); i++ )
+            {
+                namespaces[i] =
+                    new XMLNamespaceManifestPath(
+                                                  namespacesTag.getChild( i ).getChild( "uri" ).getValue(),
+                                                  facade.getFullPath( new File(
+                                                                                namespacesTag.getChild( i ).getChild( "manifest" ).getValue() ) ) );
+            }
+            return namespaces;
         }
-
-        return namespaces;
+        else
+        {
+            return new XMLNamespaceManifestPath[0];
+        }
     }
-    
+
     @Override
     public IPath getOutputFolderPath()
     {
-    	 return facade.getProjectRelativePath(evaluate(configuration.getChild("outputDirectory")));
+        return facade.getProjectRelativePath( evaluate( configuration.getChild( "outputDirectory" ) ) );
     }
 
     /**
      * Returns <tt>true</tt> if this artifact belongs to Air Framework.
+     * 
      * @param artifact The artifact to test.
      * @return <tt>true</tt> if this artifact belongs to Air Framework.
      */
-    protected boolean isAirFramework(final Artifact artifact)
+    protected boolean isAirFramework( final Artifact artifact )
     {
-        return artifact.getGroupId().startsWith("com.adobe.air.framework");
+        return artifact.getGroupId().startsWith( "com.adobe.air.framework" );
     }
 
     /**
      * Returns <tt>true</tt> if this artifact belongs to Flash Framework.
+     * 
      * @param artifact The artifact to test.
      * @return <tt>true</tt> if this artifact belongs to Flash Framework.
      */
-    protected boolean isFlashFramework(final Artifact artifact)
+    protected boolean isFlashFramework( final Artifact artifact )
     {
-        return artifact.getGroupId().startsWith("com.adobe.flash.framework");
+        return artifact.getGroupId().startsWith( "com.adobe.flash.framework" );
     }
 
     /**
      * Returns <tt>true</tt> if this artifact belongs to Flex Framework.
+     * 
      * @param artifact The artifact to test.
      * @return <tt>true</tt> if this artifact belongs to Flex Framework.
      */
-    protected boolean isFlexFramework(final Artifact artifact)
+    protected boolean isFlexFramework( final Artifact artifact )
     {
-        return artifact.getGroupId().startsWith("com.adobe.flex.framework")
-            || artifact.getGroupId().startsWith("org.apache.flex.framework");
+        return artifact.getGroupId().startsWith( "com.adobe.flex.framework" )
+            || artifact.getGroupId().startsWith( "org.apache.flex.framework" );
     }
 
 }

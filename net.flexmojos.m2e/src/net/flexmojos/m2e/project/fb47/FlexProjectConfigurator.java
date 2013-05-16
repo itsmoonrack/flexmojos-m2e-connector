@@ -17,16 +17,16 @@ public class FlexProjectConfigurator
 {
 
     @Inject
-    public FlexProjectConfigurator(final IMavenProjectFacade facade, final IProgressMonitor monitor,
-        final IMavenFlexPlugin plugin)
+    public FlexProjectConfigurator( final IMavenProjectFacade facade, final IProgressMonitor monitor,
+                                    final IMavenFlexPlugin plugin )
     {
-        super(plugin);
+        super( plugin );
         this.monitor = monitor;
         project = facade.getProject();
 
-        final IFlexProject flexProject = FlexProjectManager.getFlexProject(project);
+        final IFlexProject flexProject = FlexProjectManager.getFlexProject( project );
         // Checks if project already exists.
-        if (flexProject != null)
+        if ( flexProject != null )
         {
             // If it does, reuse the settings.
             settings = flexProject.getFlexProjectSettingsClone();
@@ -35,8 +35,15 @@ public class FlexProjectConfigurator
         {
             // If it does not, create new settings.
             settings =
-                FlexProjectManager.createFlexProjectDescription(project.getName(), project.getLocation(),
-                    false /* FIXME: hard-coded! */, FlexServerType.NO_SERVER /* FIXME: hard-coded! */);
+                FlexProjectManager.createFlexProjectDescription( project.getName(), project.getLocation(), false /*
+                                                                                                                  * FIXME:
+                                                                                                                  * hard
+                                                                                                                  * -
+                                                                                                                  * coded
+                                                                                                                  * !
+                                                                                                                  */,
+                                                                 FlexServerType.NO_SERVER
+                /* FIXME : hard - coded ! */);
         }
     }
 
@@ -44,14 +51,14 @@ public class FlexProjectConfigurator
     public void saveDescription()
     {
         final FlexProjectSettings flexProjectSettings = (FlexProjectSettings) settings;
-        flexProjectSettings.saveDescription(project, monitor);
+        flexProjectSettings.saveDescription( project, monitor );
     }
 
     @Override
     protected void configureLibraryPath()
     {
         super.configureFlexSDKName();
-        settings.setDefaultLinkType(IClassPathEntry.LINK_TYPE_RSL);
+        settings.setDefaultLinkType( IClassPathEntry.LINK_TYPE_RSL );
         super.configureLibraryPath();
     }
 
