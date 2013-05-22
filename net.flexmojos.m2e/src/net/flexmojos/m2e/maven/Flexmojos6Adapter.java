@@ -84,7 +84,7 @@ public class Flexmojos6Adapter
             return artifacts.get( "org.apache.flex.framework:flex-framework" );
 
         // Checks an Adobe Flex Framework artifact exists.
-        if ( artifacts.containsKey( "org.apache.flex.framework:flex-framework" ) )
+        if ( artifacts.containsKey( "com.adobe.flex.framework:flex-framework" ) )
             // If it does, return the instance of Adobe Flex Framework artifact.
             return artifacts.get( "com.adobe.flex.framework:flex-framework" );
 
@@ -240,6 +240,21 @@ public class Flexmojos6Adapter
     {
         return artifact.getGroupId().startsWith( "com.adobe.flex.framework" )
             || artifact.getGroupId().startsWith( "org.apache.flex.framework" );
+    }
+
+    @Override
+    public IPath getCertificatePath()
+    {
+        final Xpp3Dom airConfig =
+            facade.getMavenProject().getGoalConfiguration( "net.flexmojos.oss", "flexmojos-maven-plugin",
+                                                           "default-sign-air", "sign-air" );
+
+        final Xpp3Dom keystoreTag = airConfig.getChild( "keystore" );
+
+        if ( keystoreTag != null )
+            return facade.getProjectRelativePath( evaluate( keystoreTag ) );
+        else
+            return null;
     }
 
 }

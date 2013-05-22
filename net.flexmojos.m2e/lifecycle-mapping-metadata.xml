@@ -13,6 +13,7 @@
 					<goal>test-compile</goal>
 					<goal>compile-swc</goal>
 					<goal>compile-swf</goal>
+					<goal>sign-air</goal>
 				</goals>
 			</pluginExecutionFilter>
 			<action>

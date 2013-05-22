@@ -47,6 +47,11 @@ public interface IMavenFlexPlugin
     IPath getOutputFolderPath();
 
     /**
+     * Gets the certificate folder path.
+     */
+    IPath getCertificatePath();
+
+    /**
      * Gets the artifacts by adding Maven's SWC dependencies of the project.
      */
     Map<String, Artifact> getDependencies();

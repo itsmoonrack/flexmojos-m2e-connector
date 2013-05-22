@@ -171,7 +171,7 @@ public abstract class FlashBuilderAbstractModule
             // Checks the net.flexmojos.oss plug-in exists.
             flexmojos =
                 facade.getMojoExecutions( "net.flexmojos.oss", "flexmojos-maven-plugin", monitor, "compile-swf",
-                                          "compile-swc" );
+                                          "compile-swc", "sign-air" );
 
             if ( flexmojos.size() != 0 )
             {
@@ -184,7 +184,7 @@ public abstract class FlashBuilderAbstractModule
             // Checks the org.sonatype.flexmojos plug-in exists.
             flexmojos =
                 facade.getMojoExecutions( "org.sonatype.flexmojos", "flexmojos-maven-plugin", monitor, "compile-swf",
-                                          "compile-swc" );
+                                          "compile-swc", "sign-air" );
 
             return null;
         }
