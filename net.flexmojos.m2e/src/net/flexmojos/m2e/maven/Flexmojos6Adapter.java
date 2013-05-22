@@ -22,6 +22,12 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 import com.google.inject.Inject;
 
+/**
+ * Implementation of the Flexmojos 6.x plugin.
+ * 
+ * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
+ *
+ */
 public class Flexmojos6Adapter implements IMavenFlexPlugin {
 
   protected IMavenProjectFacade facade;

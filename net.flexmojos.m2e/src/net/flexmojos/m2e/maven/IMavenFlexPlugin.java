@@ -6,7 +6,6 @@ import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.runtime.IPath;
 
 /**
- * 
  * Defines the interface for implementation classes.
  * 
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)

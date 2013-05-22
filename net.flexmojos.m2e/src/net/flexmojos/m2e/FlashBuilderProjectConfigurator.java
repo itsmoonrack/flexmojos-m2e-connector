@@ -27,15 +27,7 @@ public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
 
 
   public FlashBuilderProjectConfigurator() {
-    //    int major = 0, minor = 0;
-    //
-    //    try {
-    //      major = com.adobe.flexbuilder.project.FlexProjectConstants.AMT_FB4_MAJOR_VERSION;
-    //      minor = com.adobe.flexbuilder.project.FlexProjectConstants.AMT_FB4_MINOR_VERSION;
-    //    }
-    //    catch (final Exception e) {
-    //
-    //    }
+    // TODO: find the current Flash Builder version and set the class module compatible with the platform.
   }
 
   /**
@@ -52,6 +44,7 @@ public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
     }
 
     // Creates the project configurator through the FlashBuilderModule.
+    // TODO: use the class module and instantiates it; FlashBuilder47Module is here hard-coded.
     final Injector injector = Guice.createInjector(new FlashBuilder47Module(request, monitor));
     final AbstractConfigurator configurator = injector.getInstance(AbstractConfigurator.class);
 

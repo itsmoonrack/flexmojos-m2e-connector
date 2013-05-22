@@ -8,6 +8,7 @@ The connector will synchronize the project settings in a pom first fashion:
 -   Adds source, test, and resources paths to project source paths,
 -   Adds Flex framework version to project (will generates "Flex 4.9.0" for flex-framework:4.9.0.1425567),
 -   Adds other SWC dependencies from local .m2 repository to project library paths.
+-   Compiles locales under the src/main/locales/{locale} folder by default, support pom.xml overriding.
 
 Contribute to the project
 -------------------------
@@ -92,3 +93,12 @@ Contributing to the project necessitate some configuration, follow the steps bel
     Call this target platform Flash Builder 4.x, and make sure it is the only platform activated.
 
     When you launch the plug-in in run or debug mode, it will create an Eclipse Application in your Run/Debug Configuration. Open it and navigates to the Plug-ins tab, in the *Launch with:* drop-down, choose plugin-ins selected bellow only. Make sure all plug-ins under **Target Platform** are thick, and check that m2e plugins under **Workspace** are un-thick, this can cause compatibility problems.
+
+Architecture
+------------
+
+The project uses a Bridge pattern which decouple the ProjectConfigurator from its MavenFlexPlugin. This pattern is used to cover the product and version space of different version of Flash Builder (4.0, 4.5, 4.6 and 4.7) but also different version of Maven Flex Plugin (Flexmojos 4.x, 5.x and 6.x, and MavenFlexPlugin 1.0).
+
+The bridge pattern is useful when both the class defining the implementation for different product and what it does vary often. The class itself can be thought of as the implementation and what the class do as the abstraction. It can also be thought of as two layers of abstraction. This pattern is often confused with the adapter pattern. In fact, the bridge pattern is implemented using the class adapter pattern, e.g. the Flexmojos6Adapter.
+
+To wire this configuration of classes, the project is using Dependency Injection through com.google.inject and JSR specification. When a Right Click > Update Project configuration is requested, the class responsible for configuring the container select a compatible adapter plugin for FlexMavenPlugin from the pom artifacts. The configuration of the refined class for project configurator is selected at eclipse plugin load time.
