@@ -96,6 +96,10 @@ public class Flexmojos6Adapter
             // If it does, return the instance of Adobe Flex AIR Framework artifact.
             return artifacts.get( "com.adobe.flex.framework.air:air-framework" );
 
+        if ( artifacts.containsKey( "com.adobe.flex.framework:air-framework" ) )
+            // If it does, return the instance of Adobe Flex AIR Framework artifact.
+            return artifacts.get( "com.adobe.flex.framework:air-framework" );
+
         // Inform user that Flex Framework artifact could not be found.
         throw new RuntimeException( "Flex Framework not found in project's artifacts." );
     }

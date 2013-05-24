@@ -208,7 +208,8 @@ public abstract class FlashBuilderAbstractModule
         final Map<String, Artifact> dependencies = facade.getMavenProject().getArtifactMap();
         // Supports both Adobe and Apache groupId.
         return dependencies.containsKey( "com.adobe.flex.framework.air:air-framework" )
-            || dependencies.containsKey( "org.apache.flex.framework.air:air-framework" );
+            || dependencies.containsKey( "org.apache.flex.framework.air:air-framework" )
+            || dependencies.containsKey( "com.adobe.flex.framework:air-framework" );
     }
 
 }
