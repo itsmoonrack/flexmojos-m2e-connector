@@ -206,6 +206,21 @@ implements IMavenFlexPlugin
     }
 
     @Override
+    public IPath getCertificatePath()
+    {
+        final Xpp3Dom airConfig =
+                        facade.getMavenProject().getGoalConfiguration( "net.flexmojos.oss", "flexmojos-maven-plugin",
+                                                                       "default-sign-air", "sign-air" );
+
+        final Xpp3Dom keystoreTag = airConfig.getChild( "keystore" );
+
+        if ( keystoreTag != null )
+            return facade.getProjectRelativePath( evaluate( keystoreTag ) );
+        else
+            return null;
+    }
+
+    @Override
     public IPath getOutputFolderPath()
     {
         return facade.getProjectRelativePath( evaluate( configuration.getChild( "outputDirectory" ) ) );
@@ -243,21 +258,6 @@ implements IMavenFlexPlugin
     {
         return artifact.getGroupId().startsWith( "com.adobe.flex.framework" )
                         || artifact.getGroupId().startsWith( "org.apache.flex.framework" );
-    }
-
-    @Override
-    public IPath getCertificatePath()
-    {
-        final Xpp3Dom airConfig =
-                        facade.getMavenProject().getGoalConfiguration( "net.flexmojos.oss", "flexmojos-maven-plugin",
-                                                                       "default-sign-air", "sign-air" );
-
-        final Xpp3Dom keystoreTag = airConfig.getChild( "keystore" );
-
-        if ( keystoreTag != null )
-            return facade.getProjectRelativePath( evaluate( keystoreTag ) );
-        else
-            return null;
     }
 
 }
