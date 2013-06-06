@@ -5,12 +5,11 @@ import java.util.Map;
 import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.runtime.IPath;
 
-import com.adobe.flexbuilder.project.XMLNamespaceManifestPath;
-
 /**
  * Defines the interface for implementation classes.
  * 
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
+ * @author Sebastien Pinel
  */
 public interface IMavenFlexPlugin
 {
@@ -67,8 +66,8 @@ public interface IMavenFlexPlugin
     String[] getLocalesCompiled();
 
     /**
-     * Gets the locales compiled.
+     * Gets the XML name-space manifest path map.
      */
-    XMLNamespaceManifestPath[] getXMLNamespaceManifestPath();
+    Map<String, IPath> getXMLNamespaceManifestPath();
 
 }

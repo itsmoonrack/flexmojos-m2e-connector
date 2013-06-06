@@ -27,7 +27,7 @@ import com.adobe.flexbuilder.util.FlashPlayerVersion;
 import com.google.inject.Inject;
 
 public class ActionScriptProjectConfigurator
-    extends AbstractConfigurator
+extends AbstractConfigurator
 {
 
     protected IProject project;
@@ -49,7 +49,7 @@ public class ActionScriptProjectConfigurator
         this.monitor = monitor;
         project = facade.getProject();
         settings = ActionScriptCore.createProjectDescription( project.getName(), project.getLocation(), false
-        /* FIXME : hard - coded ! */);
+                        /* FIXME : hard - coded ! */);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ActionScriptProjectConfigurator
     @Override
     protected void configureHTMLTemplate()
     {
-        IFolder template = project.getFolder( "html-template" );
+        final IFolder template = project.getFolder( "html-template" );
         if ( template.exists() )
         {
             settings.setHTMLExpressInstall( true );
@@ -93,7 +93,6 @@ public class ActionScriptProjectConfigurator
         {
             // Converts IPath to IClassPathEntry.
             classPath[i] = ClassPathEntryFactory.newEntry( paths[i].toString(), settings );
-
         }
 
         settings.setSourcePath( classPath );
@@ -123,6 +122,7 @@ public class ActionScriptProjectConfigurator
     {
         final Map<String, Artifact> dependencies = plugin.getDependencies();
         final Map<String, IClassPathEntry> classPath = new LinkedHashMap<String, IClassPathEntry>();
+
         for ( final IClassPathEntry entry : settings.getLibraryPath() )
         {
             // Copy previous library path that exists in project's dependencies.
@@ -144,19 +144,20 @@ public class ActionScriptProjectConfigurator
             }
             final String scope = artifact.getScope();
             final IClassPathEntry entry =
-                ClassPathEntryFactory.newEntry( IClassPathEntry.KIND_LIBRARY_FILE, path, settings );
+                            ClassPathEntryFactory.newEntry( IClassPathEntry.KIND_LIBRARY_FILE, path, settings );
 
             if ( scope.equals( "rsl" ) && ( project instanceof FlexProjectConfigurator ) )
             {
                 entry.setLinkType( IClassPathEntry.LINK_TYPE_CROSS_DOMAIN_RSL );
                 entry.setCrossDomainRsls( new CrossDomainRslEntry[] { new CrossDomainRslEntry( artifact.getArtifactId()
-                    + ".swf", "", true ) } );
+                                                                                               + ".swf", "", true ) } );
             }
 
             if ( !scope.equals( "test" ) )
                 // Adds entry to class path.
                 classPath.put( path, entry );
         }
+
         settings.setLibraryPath( classPath.values().toArray( new IClassPathEntry[classPath.size()] ) );
     }
 

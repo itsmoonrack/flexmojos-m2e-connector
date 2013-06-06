@@ -21,16 +21,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
-import com.adobe.flexbuilder.project.XMLNamespaceManifestPath;
 import com.google.inject.Inject;
 
 /**
  * Implementation of the Flexmojos 6.x plugin.
  * 
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
+ * @author Sebastien Pinel
  */
 public class Flexmojos6Adapter
-    implements IMavenFlexPlugin
+implements IMavenFlexPlugin
 {
     protected IMavenProjectFacade facade;
 
@@ -46,8 +46,8 @@ public class Flexmojos6Adapter
     {
         this.facade = facade;
         this.monitor = monitor;
-        evaluator = new PluginParameterExpressionEvaluator( session, mojo );
-        configuration = mojo.getConfiguration();
+        this.evaluator = new PluginParameterExpressionEvaluator( session, mojo );
+        this.configuration = mojo.getConfiguration();
     }
 
     /**
@@ -147,7 +147,7 @@ public class Flexmojos6Adapter
         {
             // Only manage SWC type dependencies.
             if ( SWC.equals( artifact.getType() ) && !isAirFramework( artifact ) && !isFlashFramework( artifact )
-                && !isFlexFramework( artifact ) )
+                            && !isFlexFramework( artifact ) )
             {
                 dependencies.put( artifact.getFile().getAbsolutePath(), artifact );
             }
@@ -189,26 +189,22 @@ public class Flexmojos6Adapter
     }
 
     @Override
-    public XMLNamespaceManifestPath[] getXMLNamespaceManifestPath()
+    public Map<String, IPath> getXMLNamespaceManifestPath()
     {
         final Xpp3Dom namespacesTag = configuration.getChild( "namespaces" );
+        final Map<String, IPath> namespaces = new LinkedHashMap<String, IPath>();
+
         if ( namespacesTag != null )
         {
-            final XMLNamespaceManifestPath[] namespaces = new XMLNamespaceManifestPath[namespacesTag.getChildCount()];
-            for ( int i = 0; i < namespacesTag.getChildCount(); i++ )
+            for ( final Xpp3Dom namespace : namespacesTag.getChildren() )
             {
-                namespaces[i] =
-                    new XMLNamespaceManifestPath(
-                                                  namespacesTag.getChild( i ).getChild( "uri" ).getValue(),
-                                                  facade.getFullPath( new File(
-                                                                                namespacesTag.getChild( i ).getChild( "manifest" ).getValue() ) ) );
+                final String key = namespace.getChild( "uri" ).getValue();
+                final IPath value = facade.getFullPath(new File(namespace.getChild( "manifest" ).getValue()));
+                namespaces.put( key, value );
             }
-            return namespaces;
         }
-        else
-        {
-            return new XMLNamespaceManifestPath[0];
-        }
+
+        return namespaces;
     }
 
     @Override
@@ -248,15 +244,15 @@ public class Flexmojos6Adapter
     protected boolean isFlexFramework( final Artifact artifact )
     {
         return artifact.getGroupId().startsWith( "com.adobe.flex.framework" )
-            || artifact.getGroupId().startsWith( "org.apache.flex.framework" );
+                        || artifact.getGroupId().startsWith( "org.apache.flex.framework" );
     }
 
     @Override
     public IPath getCertificatePath()
     {
         final Xpp3Dom airConfig =
-            facade.getMavenProject().getGoalConfiguration( "net.flexmojos.oss", "flexmojos-maven-plugin",
-                                                           "default-sign-air", "sign-air" );
+                        facade.getMavenProject().getGoalConfiguration( "net.flexmojos.oss", "flexmojos-maven-plugin",
+                                                                       "default-sign-air", "sign-air" );
 
         final Xpp3Dom keystoreTag = airConfig.getChild( "keystore" );
 
