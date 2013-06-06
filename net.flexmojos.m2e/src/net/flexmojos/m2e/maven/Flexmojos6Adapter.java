@@ -161,10 +161,8 @@ implements IMavenFlexPlugin
     {
         final String localesSourcePath = evaluate( configuration.getChild( "localesSourcePath" ) );
         final IPath path = facade.getProjectRelativePath( localesSourcePath );
-        if ( path.toFile().exists() )
-            return facade.getProjectRelativePath( localesSourcePath );
-        else
-            return null;
+        // Checks the base path (without the placeholder {locale} exists).
+        return facade.getProject().exists( path.removeLastSegments( 1 ) ) ? path : null;
     }
 
     @Override

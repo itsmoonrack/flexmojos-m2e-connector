@@ -168,9 +168,10 @@ extends AbstractConfigurator
 
         // Sets source-path argument.
         final List<String> pathElements = new LinkedList<String>();
-        if ( plugin.getLocalesSourcePath() != null )
+        final IPath localesSourcePath = plugin.getLocalesSourcePath();
+        if ( localesSourcePath != null )
         {
-            pathElements.add( plugin.getLocalesSourcePath().toString() );
+            pathElements.add( localesSourcePath.toString() );
         }
         arguments.setSourcePath( pathElements );
 
