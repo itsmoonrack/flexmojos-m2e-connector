@@ -19,41 +19,44 @@ import com.google.inject.Injector;
 
 /**
  * Configures a FlashBuilder project from Maven.
- *
+ * 
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
- *
  */
-public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator {
+public class FlashBuilderProjectConfigurator
+    extends AbstractProjectConfigurator
+{
 
-
-  public FlashBuilderProjectConfigurator() {
-    // TODO: find the current Flash Builder version and set the class module compatible with the platform.
-  }
-
-  /**
-   * Adds the Flash/Flex/Air nature to projects qualified as Flash Builder compatible, i.e,
-   * having a packaging of type "swc", "swf", or "air" in their pom.xml file.
-   * 
-   * The configurator looks through the declared dependencies of the pom.xml file to infers the project type.
-   */
-  @Override
-  public void configure(final ProjectConfigurationRequest request, final IProgressMonitor monitor) throws CoreException {
-    final IMavenProjectFacade facade = request.getMavenProjectFacade();
-    if (!isQualifiedAsFlashBuilderProject(facade)) {
-      return;
+    public FlashBuilderProjectConfigurator()
+    {
+        // TODO: find the current Flash Builder version and set the class module compatible with the platform.
     }
 
-    // Creates the project configurator through the FlashBuilderModule.
-    // TODO: use the class module and instantiates it; FlashBuilder47Module is here hard-coded.
-    final Injector injector = Guice.createInjector(new FlashBuilder47Module(request, monitor));
-    final AbstractConfigurator configurator = injector.getInstance(AbstractConfigurator.class);
+    /**
+     * Adds the Flash/Flex/Air nature to projects qualified as Flash Builder compatible, i.e, having a packaging of type
+     * "swc", "swf", or "air" in their pom.xml file. The configurator looks through the declared dependencies of the
+     * pom.xml file to infers the project type.
+     */
+    @Override
+    public void configure( final ProjectConfigurationRequest request, final IProgressMonitor monitor )
+        throws CoreException
+    {
+        final IMavenProjectFacade facade = request.getMavenProjectFacade();
+        if ( !isQualifiedAsFlashBuilderProject( facade ) )
+        {
+            return;
+        }
 
-    configurator.configure();
-    configurator.saveDescription();
-  }
+        // Creates the project configurator through the FlashBuilderModule.
+        final Injector injector = Guice.createInjector( new FlashBuilder47Module( request, monitor ) );
+        final AbstractConfigurator configurator = injector.getInstance( AbstractConfigurator.class );
 
-  private boolean isQualifiedAsFlashBuilderProject(final IMavenProjectFacade facade) {
-    return Arrays.asList(new String[]{AIR, SWC, SWF}).contains(facade.getPackaging());
-  }
+        configurator.configure();
+        configurator.saveDescription();
+    }
+
+    private boolean isQualifiedAsFlashBuilderProject( final IMavenProjectFacade facade )
+    {
+        return Arrays.asList( new String[] { AIR, SWC, SWF } ).contains( facade.getPackaging() );
+    }
 
 }
