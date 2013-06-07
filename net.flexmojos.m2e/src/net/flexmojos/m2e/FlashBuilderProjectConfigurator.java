@@ -19,11 +19,10 @@ import com.google.inject.Injector;
 
 /**
  * Configures a FlashBuilder project from Maven.
- * 
+ *
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  */
-public class FlashBuilderProjectConfigurator
-    extends AbstractProjectConfigurator
+public class FlashBuilderProjectConfigurator extends AbstractProjectConfigurator
 {
 
     public FlashBuilderProjectConfigurator()
@@ -47,7 +46,8 @@ public class FlashBuilderProjectConfigurator
         }
 
         // Creates the project configurator through the FlashBuilderModule.
-        final Injector injector = Guice.createInjector( new FlashBuilder47Module( request, monitor ) );
+        final FlashBuilderAbstractModule module = new FlashBuilder47Module( facade, monitor, request.getMavenSession() );
+        final Injector injector = Guice.createInjector( module );
         final AbstractConfigurator configurator = injector.getInstance( AbstractConfigurator.class );
 
         configurator.configure();

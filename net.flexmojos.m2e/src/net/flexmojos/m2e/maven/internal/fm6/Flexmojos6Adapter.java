@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.maven;
+package net.flexmojos.m2e.maven.internal.fm6;
 
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 
@@ -9,12 +9,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.flexmojos.m2e.maven.IMavenFlexPlugin;
+import net.flexmojos.m2e.maven.internal.MavenFlexPlugin;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,50 +26,21 @@ import com.google.inject.Inject;
 
 /**
  * Implementation of the Flexmojos 6.x plugin.
- * 
+ *
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  * @author Sebastien Pinel
  */
-public class Flexmojos6Adapter
+public abstract class Flexmojos6Adapter extends MavenFlexPlugin
 implements IMavenFlexPlugin
 {
-    protected IMavenProjectFacade facade;
-
-    protected IProgressMonitor monitor;
-
-    protected ExpressionEvaluator evaluator;
-
-    protected Xpp3Dom configuration;
-
-    @Inject
-    public Flexmojos6Adapter( final IMavenProjectFacade facade, final IProgressMonitor monitor,
-                              final MavenSession session, final MojoExecution mojo )
+    @Inject Flexmojos6Adapter( final IMavenProjectFacade facade,
+                               final IProgressMonitor monitor,
+                               final MavenSession session,
+                               final Plugin plugin )
     {
-        this.facade = facade;
-        this.monitor = monitor;
-        this.evaluator = new PluginParameterExpressionEvaluator( session, mojo );
-        this.configuration = mojo.getConfiguration();
+        super( facade, monitor, session, plugin );
     }
 
-    /**
-     * Short-hand method for evaluating a configuration value.
-     * 
-     * @return
-     */
-    protected String evaluate( final Xpp3Dom conf )
-    {
-        try
-        {
-            if ( conf.getValue() != null )
-                return (String) evaluator.evaluate( conf.getValue() );
-            else
-                return (String) evaluator.evaluate( conf.getAttribute( "default-value" ) );
-        }
-        catch ( final Exception e )
-        {
-            return null;
-        }
-    }
 
     @Override
     public IPath getMainSourceFolder()
@@ -93,6 +65,7 @@ implements IMavenFlexPlugin
             // If it does, return the instance of Adobe Flex Framework artifact.
             return artifacts.get( "com.adobe.flex.framework:flex-framework" );
 
+        // TODO: Move the following air-framework in a new method getAirFramework() ?
         if ( artifacts.containsKey( "org.apache.flex.framework.air:air-framework" ) )
             // If it does, return the instance of Adobe Flex AIR Framework artifact.
             return artifacts.get( "org.apache.flex.framework.air:air-framework" );
@@ -128,13 +101,13 @@ implements IMavenFlexPlugin
     @Override
     public String getTargetPlayerVersion()
     {
-        return evaluate( configuration.getChild( "targetPlayer" ) );
+        return configuration.evaluate( "targetPlayer" );
     }
 
     @Override
     public IPath getMainApplicationPath()
     {
-        final String sourceFile = evaluate( configuration.getChild( "sourceFile" ) );
+        final String sourceFile = configuration.evaluate( "sourceFile" );
         return sourceFile == null ? null : new Path( sourceFile );
     }
 
@@ -146,8 +119,7 @@ implements IMavenFlexPlugin
         for ( final Artifact artifact : facade.getMavenProject().getArtifacts() )
         {
             // Only manage SWC type dependencies.
-            if ( SWC.equals( artifact.getType() ) && !isAirFramework( artifact ) && !isFlashFramework( artifact )
-                            && !isFlexFramework( artifact ) )
+            if ( SWC.equals( artifact.getType() ) && !isAirFramework( artifact ) && !isFlashFramework( artifact ) && !isFlexFramework( artifact ) )
             {
                 dependencies.put( artifact.getFile().getAbsolutePath(), artifact );
             }
@@ -159,7 +131,7 @@ implements IMavenFlexPlugin
     @Override
     public IPath getLocalesSourcePath()
     {
-        final String localesSourcePath = evaluate( configuration.getChild( "localesSourcePath" ) );
+        final String localesSourcePath = configuration.evaluate( "localesSourcePath" );
         final IPath path = facade.getProjectRelativePath( localesSourcePath );
         // Checks the base path (without the placeholder {locale} exists).
         return facade.getProject().exists( path.removeLastSegments( 1 ) ) ? path : null;
@@ -168,7 +140,7 @@ implements IMavenFlexPlugin
     @Override
     public String[] getLocalesCompiled()
     {
-        final Xpp3Dom localesCompiled = configuration.getChild( "localesCompiled" );
+        final Xpp3Dom localesCompiled = null; //configuration.getChild( "localesCompiled" );
         if ( localesCompiled != null )
         {
             final String[] locales = new String[localesCompiled.getChildCount()];
@@ -189,7 +161,7 @@ implements IMavenFlexPlugin
     @Override
     public Map<String, IPath> getXMLNamespaceManifestPath()
     {
-        final Xpp3Dom namespacesTag = configuration.getChild( "namespaces" );
+        final Xpp3Dom namespacesTag = null;// configuration.getChild( "namespaces" );
         final Map<String, IPath> namespaces = new LinkedHashMap<String, IPath>();
 
         if ( namespacesTag != null )
@@ -215,7 +187,7 @@ implements IMavenFlexPlugin
         final Xpp3Dom keystoreTag = airConfig.getChild( "keystore" );
 
         if ( keystoreTag != null )
-            return facade.getProjectRelativePath( evaluate( keystoreTag ) );
+            return facade.getProjectRelativePath( null /* evaluate( keystoreTag ) */ );
         else
             return null;
     }
@@ -223,12 +195,21 @@ implements IMavenFlexPlugin
     @Override
     public IPath getOutputFolderPath()
     {
-        return facade.getProjectRelativePath( evaluate( configuration.getChild( "outputDirectory" ) ) );
+        final Xpp3Dom outputDirectory = null; //configuration.getChild( "outputDirectory" );
+
+        // Checks outputDirectory has been set, e.g. if not returning default value.
+        if (outputDirectory.getValue().equals( "${project.build.outputDirectory}" ))
+        {
+            return facade.getProjectRelativePath( null /*evaluate( outputDirectory )*/ );
+        }
+        else {
+            return new Path(null /*evaluate( outputDirectory )*/);
+        }
     }
 
     /**
      * Returns <tt>true</tt> if this artifact belongs to Air Framework.
-     * 
+     *
      * @param artifact The artifact to test.
      * @return <tt>true</tt> if this artifact belongs to Air Framework.
      */
@@ -239,7 +220,7 @@ implements IMavenFlexPlugin
 
     /**
      * Returns <tt>true</tt> if this artifact belongs to Flash Framework.
-     * 
+     *
      * @param artifact The artifact to test.
      * @return <tt>true</tt> if this artifact belongs to Flash Framework.
      */
@@ -250,14 +231,14 @@ implements IMavenFlexPlugin
 
     /**
      * Returns <tt>true</tt> if this artifact belongs to Flex Framework.
-     * 
+     *
      * @param artifact The artifact to test.
      * @return <tt>true</tt> if this artifact belongs to Flex Framework.
      */
     protected boolean isFlexFramework( final Artifact artifact )
     {
         return artifact.getGroupId().startsWith( "com.adobe.flex.framework" )
-                        || artifact.getGroupId().startsWith( "org.apache.flex.framework" );
+            || artifact.getGroupId().startsWith( "org.apache.flex.framework" );
     }
 
 }

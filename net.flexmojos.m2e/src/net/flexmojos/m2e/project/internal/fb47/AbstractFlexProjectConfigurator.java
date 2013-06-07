@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.project.fb47;
+package net.flexmojos.m2e.project.internal.fb47;
 
 import net.flexmojos.m2e.flex.FlexFrameworkHelper;
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;

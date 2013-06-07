@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.project.fb47;
+package net.flexmojos.m2e.project.internal.fb47;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,6 +151,10 @@ extends AbstractConfigurator
                 entry.setLinkType( IClassPathEntry.LINK_TYPE_CROSS_DOMAIN_RSL );
                 entry.setCrossDomainRsls( new CrossDomainRslEntry[] { new CrossDomainRslEntry( artifact.getArtifactId()
                                                                                                + ".swf", "", true ) } );
+            }
+            else if (scope.equals( "internal" ))
+            {
+                entry.setLinkType( IClassPathEntry.LINK_TYPE_INTERNAL );
             }
 
             if ( !scope.equals( "test" ) )
