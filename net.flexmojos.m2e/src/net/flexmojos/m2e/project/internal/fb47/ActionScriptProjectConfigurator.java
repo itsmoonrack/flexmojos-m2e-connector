@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 import com.adobe.flexbuilder.project.ClassPathEntryFactory;
 import com.adobe.flexbuilder.project.IClassPathEntry;
@@ -26,8 +25,7 @@ import com.adobe.flexbuilder.project.common.CrossDomainRslEntry;
 import com.adobe.flexbuilder.util.FlashPlayerVersion;
 import com.google.inject.Inject;
 
-public class ActionScriptProjectConfigurator
-extends AbstractConfigurator
+public class ActionScriptProjectConfigurator extends AbstractConfigurator
 {
 
     protected IProject project;
@@ -36,20 +34,15 @@ extends AbstractConfigurator
 
     protected IMutableActionScriptProjectSettings settings;
 
-    protected ActionScriptProjectConfigurator( final IMavenFlexPlugin plugin )
+    @Inject ActionScriptProjectConfigurator( final IMavenFlexPlugin plugin,
+                                             final IProject project,
+                                             final IProgressMonitor monitor )
     {
         super( plugin );
-    }
-
-    @Inject
-    public ActionScriptProjectConfigurator( final IMavenProjectFacade facade, final IProgressMonitor monitor,
-                                            final IMavenFlexPlugin plugin )
-    {
-        this( plugin );
+        this.project = project;
         this.monitor = monitor;
-        project = facade.getProject();
-        settings = ActionScriptCore.createProjectDescription( project.getName(), project.getLocation(), false
-                        /* FIXME : hard - coded ! */);
+        this.settings = ActionScriptCore
+                        .createProjectDescription( project.getName(), project.getLocation(), false /* FIXME : hard - coded ! */);
     }
 
     @Override

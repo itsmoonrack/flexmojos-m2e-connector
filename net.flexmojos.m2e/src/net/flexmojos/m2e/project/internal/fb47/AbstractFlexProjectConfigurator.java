@@ -3,8 +3,8 @@ package net.flexmojos.m2e.project.internal.fb47;
 import net.flexmojos.m2e.flex.FlexFrameworkHelper;
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 import com.google.inject.Inject;
 
@@ -12,16 +12,11 @@ public abstract class AbstractFlexProjectConfigurator
     extends ActionScriptProjectConfigurator
 {
 
-    protected AbstractFlexProjectConfigurator( final IMavenFlexPlugin plugin )
+    @Inject AbstractFlexProjectConfigurator( final IMavenFlexPlugin plugin,
+                                             final IProject project,
+                                             final IProgressMonitor monitor )
     {
-        super( plugin );
-    }
-
-    @Inject
-    public AbstractFlexProjectConfigurator( final IMavenProjectFacade facade, final IProgressMonitor monitor,
-                                            final IMavenFlexPlugin plugin )
-    {
-        super( facade, monitor, plugin );
+        super( plugin, project, monitor );
     }
 
     /**

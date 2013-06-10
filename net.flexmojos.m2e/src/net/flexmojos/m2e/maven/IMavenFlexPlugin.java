@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Defines the interface for plug-in implementation classes.
@@ -33,6 +34,7 @@ public interface IMavenFlexPlugin
      * Gets the source path so the testSourceDirectory, and additional resources locations such as default
      * src/main/resources or baseOutputDirectory for "generate" goal are added to the class path.
      */
+    @NonNull
     IPath[] getSourcePath();
 
     /**

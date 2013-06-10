@@ -2,24 +2,17 @@ package net.flexmojos.m2e;
 
 import static net.flexmojos.oss.plugin.common.FlexExtension.AIR;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
-
-import java.util.Map;
-
-import net.flexmojos.m2e.maven.IMavenFlexPlugin;
-import net.flexmojos.m2e.maven.internal.fm6.Flexmojos6Adapter;
+import net.flexmojos.m2e.maven.MavenFlexModule;
 import net.flexmojos.m2e.project.AbstractConfigurator;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
+import com.google.inject.Provides;
 
 /**
  * Flash Builder abstract components configuration. Depending on the version of FlashBuilder, a specialized version of
@@ -29,25 +22,38 @@ import com.google.inject.name.Names;
  */
 public abstract class FlashBuilderAbstractModule extends AbstractModule
 {
-    private final IMavenProjectFacade facade;
+    private final IProject project;
 
     private final IProgressMonitor monitor;
 
-    private final MavenSession session;
+    private final MavenFlexModule facade;
 
-    protected FlashBuilderAbstractModule( final IMavenProjectFacade facade,
-                                          final IProgressMonitor monitor,
-                                          final MavenSession session )
+    protected FlashBuilderAbstractModule( final ProjectConfigurationRequest request,
+                                          final IProgressMonitor monitor )
     {
-        this.facade = facade;
         this.monitor = monitor;
-        this.session = session;
+        this.project = request.getProject();
+        this.facade = new MavenFlexModule( request.getMavenProjectFacade(), monitor, request.getMavenSession() );
+    }
+
+    @Provides
+    IProject getProject(final IMavenProjectFacade facade)
+    {
+        return project;
+    }
+
+    @Provides
+    IProgressMonitor getProgressMonitor()
+    {
+        return monitor;
     }
 
     @Override
     protected void configure()
     {
-        final IProject project = facade.getProject();
+        // Installs the facade to maven project, by configuring a concrete module depending on the version of the Maven
+        // Flex Plug-in available.
+        install( facade );
 
         // Adds the ActionScript nature.
         addNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
@@ -57,7 +63,7 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
         // overriding configurators to eventually define the project.
         Class<? extends AbstractConfigurator> configurator = getActionScriptProjectConfiguratorClass();
 
-        if ( isApolloProject() )
+        if ( facade.isApolloProject() )
         {
             // An Apollo project exists in two flavors: ApolloActionScriptProject, and ApolloProject. While the former
             // directly extends from ActionScriptProject, the later inherits from FlexProject, so it is perfectly
@@ -70,7 +76,7 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
             configurator = getApolloActionScriptProjectConfiguratorClass();
         }
 
-        if ( isFlexProject() )
+        if ( facade.isFlexProject() )
         {
             // Depending on the packaging, a Flex project can be a FlexLibraryProject (SWC), a FlexProject (SWF) or an
             // ApolloProject (AIR).
@@ -105,40 +111,7 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
             // End of algorithm.
         }
 
-        bind( IProgressMonitor.class ).toInstance( monitor );
-        bind( IMavenProjectFacade.class ).toInstance( facade );
         bind( AbstractConfigurator.class ).to( configurator );
-        bind( MavenSession.class ).toInstance( session );
-
-        final Plugin flexPlugin = getMavenFlexPlugin();
-        final String groupId = flexPlugin.getGroupId();
-        final String artifactId = flexPlugin.getArtifactId();
-        bind( Plugin.class ).toInstance( flexPlugin );
-
-        try
-        {
-            // Bind MojoExecution for compile goal.
-            final MojoExecution compileMojo = facade.getMojoExecutions( groupId, artifactId, monitor,
-                                                                        "compile-swf", "compile-swc").get( 0 );
-            bind( MojoExecution.class )
-                .annotatedWith( Names.named( "compile" ) )
-                .toInstance( compileMojo );
-        }
-        catch ( final CoreException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        switch ( flexPlugin.getVersion().charAt( 0 ) )
-        {
-            case 6:
-                bind( IMavenFlexPlugin.class ).to( Flexmojos6Adapter.class );
-                break;
-
-            default:
-                throw new RuntimeException( "Maven Flex Plug-in version is not supported." );
-        }
     }
 
     protected abstract Class<? extends AbstractConfigurator> getActionScriptProjectConfiguratorClass();
@@ -150,30 +123,6 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
     protected abstract Class<? extends AbstractConfigurator> getApolloProjectConfiguratorClass();
 
     protected abstract Class<? extends AbstractConfigurator> getFlexProjectConfiguratorClass();
-
-    // TODO: Move this in a factory or @Provider. Document, and use a logger.
-    /**
-     * Return the IMavenFlexPlugin implementation.
-     *
-     * @return
-     * @throws CoreException
-     */
-    protected Plugin getMavenFlexPlugin()
-    {
-        String key;
-        final Map<String, Plugin> plugins = facade.getMavenProject().getBuild().getPluginsAsMap();
-
-        if ( plugins.containsKey( key = "net.flexmojos.oss:flexmojos-maven-plugin" ) )
-        {
-        }
-        else
-        {
-            // Informs user the Maven Flex plugin could not be found.
-            throw new RuntimeException( "Maven Flex Plug-in not found in project's artifacts." );
-        }
-
-        return plugins.get( key );
-    }
 
     /**
      * Short-hand method for wrapping an "addNature" operation.
@@ -190,26 +139,7 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
         }
         catch ( final CoreException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException( e );
         }
     }
-
-    private boolean isFlexProject()
-    {
-        final Map<String, Artifact> dependencies = facade.getMavenProject().getArtifactMap();
-        // Supports both Adobe and Apache groupId.
-        return dependencies.containsKey( "com.adobe.flex.framework:common-framework" )
-            || dependencies.containsKey( "org.apache.flex.framework:common-framework" );
-    }
-
-    private boolean isApolloProject()
-    {
-        final Map<String, Artifact> dependencies = facade.getMavenProject().getArtifactMap();
-        // Supports both Adobe and Apache groupId.
-        return dependencies.containsKey( "com.adobe.flex.framework.air:air-framework" )
-            || dependencies.containsKey( "org.apache.flex.framework.air:air-framework" )
-            || dependencies.containsKey( "com.adobe.flex.framework:air-framework" );
-    }
-
 }

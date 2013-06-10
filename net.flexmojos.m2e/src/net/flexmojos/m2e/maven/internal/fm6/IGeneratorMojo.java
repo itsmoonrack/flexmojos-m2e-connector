@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.maven;
+package net.flexmojos.m2e.maven.internal.fm6;
 
 import org.eclipse.core.runtime.IPath;
 

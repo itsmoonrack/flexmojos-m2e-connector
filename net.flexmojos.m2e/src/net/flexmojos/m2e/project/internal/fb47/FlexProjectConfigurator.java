@@ -2,8 +2,8 @@ package net.flexmojos.m2e.project.internal.fb47;
 
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 import com.adobe.flexbuilder.project.FlexProjectManager;
 import com.adobe.flexbuilder.project.FlexServerType;
@@ -16,13 +16,11 @@ public class FlexProjectConfigurator
     extends AbstractFlexProjectConfigurator
 {
 
-    @Inject
-    public FlexProjectConfigurator( final IMavenProjectFacade facade, final IProgressMonitor monitor,
-                                    final IMavenFlexPlugin plugin )
+    @Inject FlexProjectConfigurator( final IMavenFlexPlugin plugin,
+                                     final IProject project,
+                                     final IProgressMonitor monitor )
     {
-        super( plugin );
-        this.monitor = monitor;
-        project = facade.getProject();
+        super( plugin, project, monitor );
 
         final IFlexProject flexProject = FlexProjectManager.getFlexProject( project );
         // Checks if project already exists.
@@ -34,16 +32,11 @@ public class FlexProjectConfigurator
         else
         {
             // If it does not, create new settings.
-            settings =
-                FlexProjectManager.createFlexProjectDescription( project.getName(), project.getLocation(), false /*
-                                                                                                                  * FIXME:
-                                                                                                                  * hard
-                                                                                                                  * -
-                                                                                                                  * coded
-                                                                                                                  * !
-                                                                                                                  */,
-                                                                 FlexServerType.NO_SERVER
-                /* FIXME : hard - coded ! */);
+            settings = FlexProjectManager
+                            .createFlexProjectDescription( project.getName(),
+                                                           project.getLocation(),
+                                                           false /* FIXME : hard - coded ! */,
+                                                           FlexServerType.NO_SERVER /* FIXME : hard - coded ! */);
         }
     }
 

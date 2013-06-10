@@ -9,6 +9,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 /**
  * Simple configuration wrapper class.
  *
+ * Maven plug-ins (build and reporting) are configured by specifying a <code><configuration></code> element where the
+ * child elements of the <code><configuration></code> element are mapped to fields inside the Mojo. Because a plug-in
+ * consists of one or more Mojos where a Mojo maps to a goal.
+ *
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  *
  */

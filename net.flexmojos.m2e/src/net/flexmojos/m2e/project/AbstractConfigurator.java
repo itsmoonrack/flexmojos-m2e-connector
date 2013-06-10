@@ -2,8 +2,6 @@ package net.flexmojos.m2e.project;
 
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
 
-import com.google.inject.Inject;
-
 /**
  * Defines abstraction interface for project configurator.
  *
@@ -22,7 +20,6 @@ public abstract class AbstractConfigurator
 {
     protected final IMavenFlexPlugin plugin;
 
-    @Inject
     protected AbstractConfigurator( final IMavenFlexPlugin plugin )
     {
         this.plugin = plugin;

@@ -4,9 +4,9 @@ import java.util.Map;
 
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 import com.adobe.flexbuilder.project.FlexProjectManager;
 import com.adobe.flexbuilder.project.IFlexLibraryProject;
@@ -18,18 +18,11 @@ public class FlexLibraryProjectConfigurator
 extends AbstractFlexProjectConfigurator
 {
 
-    protected FlexLibraryProjectConfigurator( final IMavenFlexPlugin plugin )
+    @Inject FlexLibraryProjectConfigurator( final IMavenFlexPlugin plugin,
+                                            final IProject project,
+                                            final IProgressMonitor monitor )
     {
-        super( plugin );
-    }
-
-    @Inject
-    public FlexLibraryProjectConfigurator( final IMavenProjectFacade facade, final IProgressMonitor monitor,
-                                           final IMavenFlexPlugin plugin )
-    {
-        super( plugin );
-        this.monitor = monitor;
-        project = facade.getProject();
+        super( plugin, project, monitor );
 
         final IFlexLibraryProject flexProject = (IFlexLibraryProject) FlexProjectManager.getFlexProject( project );
         // Checks if project already exists.
@@ -41,15 +34,10 @@ extends AbstractFlexProjectConfigurator
         else
         {
             // If it does not, create new settings.
-            settings =
-                            FlexProjectManager.createFlexLibraryProjectDescription( project.getName(), project.getLocation(), false /*
-                             * FIXME
-                             * :
-                             * hard
-                             * -
-                             * coded
-                             * !
-                             */);
+            settings = FlexProjectManager
+                            .createFlexLibraryProjectDescription( project.getName(),
+                                                                  project.getLocation(),
+                                                                  false /* FIXME: hard-coded ! */);
         }
     }
 
