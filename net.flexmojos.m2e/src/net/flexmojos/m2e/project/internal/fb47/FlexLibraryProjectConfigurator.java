@@ -23,7 +23,11 @@ extends AbstractFlexProjectConfigurator
                                             final IProgressMonitor monitor )
     {
         super( plugin, project, monitor );
+    }
 
+    @Override
+    protected void createConfiguration()
+    {
         final IFlexLibraryProject flexProject = (IFlexLibraryProject) FlexProjectManager.getFlexProject( project );
         // Checks if project already exists.
         if ( flexProject != null )
@@ -42,7 +46,7 @@ extends AbstractFlexProjectConfigurator
     }
 
     @Override
-    public void saveDescription()
+    protected void saveDescription()
     {
         final FlexLibraryProjectSettings flexProjectSettings = (FlexLibraryProjectSettings) settings;
         flexProjectSettings.saveDescription( project, monitor );

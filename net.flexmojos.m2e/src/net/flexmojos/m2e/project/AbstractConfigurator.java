@@ -75,6 +75,8 @@ public abstract class AbstractConfigurator
      */
     public void configure()
     {
+        createConfiguration();
+
         configureMainSourceFolder();
         configureSourcePath();
         configureOutputFolderPath();
@@ -83,11 +85,18 @@ public abstract class AbstractConfigurator
         configureTargetPlayerVersion();
         configureMainApplicationPath();
         configureAdditionalCompilerArgs();
+
+        saveDescription();
     }
+
+    /**
+     * Creates the abstract configuration from adobe's 'project' component.
+     */
+    protected abstract void createConfiguration();
 
     /**
      * Saves the project description.
      */
-    public abstract void saveDescription();
+    protected abstract void saveDescription();
 
 }

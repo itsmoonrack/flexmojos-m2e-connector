@@ -1,6 +1,9 @@
 package net.flexmojos.m2e.maven.internal.fm6;
 
+import net.flexmojos.m2e.maven.ICompilerMojo;
+import net.flexmojos.m2e.maven.IGeneratorMojo;
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
+import net.flexmojos.m2e.maven.ISignAirMojo;
 import net.flexmojos.m2e.maven.internal.MavenFlexModule;
 import net.flexmojos.m2e.maven.internal.fm6.adapters.Flexmojos6CompilerMojo;
 import net.flexmojos.m2e.maven.internal.fm6.adapters.Flexmojos6GeneratorMojo;

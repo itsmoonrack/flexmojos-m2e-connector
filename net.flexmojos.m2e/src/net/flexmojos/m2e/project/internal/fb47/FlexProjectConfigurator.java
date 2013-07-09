@@ -21,7 +21,11 @@ public class FlexProjectConfigurator
                                      final IProgressMonitor monitor )
     {
         super( plugin, project, monitor );
+    }
 
+    @Override
+    protected void createConfiguration()
+    {
         final IFlexProject flexProject = FlexProjectManager.getFlexProject( project );
         // Checks if project already exists.
         if ( flexProject != null )
@@ -41,7 +45,7 @@ public class FlexProjectConfigurator
     }
 
     @Override
-    public void saveDescription()
+    protected void saveDescription()
     {
         final FlexProjectSettings flexProjectSettings = (FlexProjectSettings) settings;
         flexProjectSettings.saveDescription( project, monitor );

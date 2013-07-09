@@ -11,16 +11,11 @@ import java.util.Map;
 
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
 import net.flexmojos.m2e.maven.internal.MavenFlexPlugin;
-import net.flexmojos.m2e.maven.internal.fm6.ICompilerMojo;
-import net.flexmojos.m2e.maven.internal.fm6.IGeneratorMojo;
-import net.flexmojos.m2e.maven.internal.fm6.ISignAirMojo;
 
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 import com.google.inject.Inject;
@@ -34,56 +29,29 @@ import com.google.inject.Inject;
 public class Flexmojos6Plugin extends MavenFlexPlugin implements IMavenFlexPlugin
 {
 
-    protected ICompilerMojo compiler;
-
-    protected IGeneratorMojo generator;
-
-    protected ISignAirMojo signAir;
-
     @Inject Flexmojos6Plugin( final IMavenProjectFacade facade,
-                              final IProgressMonitor monitor,
-                              final ICompilerMojo compiler,
-                              @Nullable final IGeneratorMojo generator,
-                              @Nullable final ISignAirMojo signAir )
+                              final IProgressMonitor monitor )
     {
         super( facade, monitor );
-        this.compiler = compiler;
-        this.generator = generator;
-        this.signAir = signAir;
     }
 
     @Override
     public IPath[] getSourcePath()
     {
+        IPath[] sourcePath = super.getSourcePath();
+
         if ( generator != null )
         {
-            final List<IPath> classPath = new ArrayList<IPath>( Arrays.asList( super.getSourcePath() ) );
+            final List<IPath> classPath = new ArrayList<IPath>( Arrays.asList( sourcePath ) );
 
             // Directories from generator mojo are treated as supplementary source path.
             classPath.add( generator.getOutputDirectory() );
             classPath.add( generator.getBaseOutputDirectory() );
 
-            return classPath.toArray( new IPath[classPath.size()] );
+            sourcePath = classPath.toArray( new IPath[classPath.size()] );
         }
-        else
-        {
-            return super.getSourcePath();
-        }
-    }
 
-    @Override
-    public String getTargetPlayerVersion()
-    {
-        return null;
-//        return configuration.evaluate( "targetPlayer" );
-    }
-
-    @Override
-    public IPath getMainApplicationPath()
-    {
-//        final String sourceFile = configuration.evaluate( "sourceFile" );
-//        return sourceFile == null ? null : new Path( sourceFile );
-        return null;
+        return sourcePath;
     }
 
     @Override
@@ -166,21 +134,6 @@ public class Flexmojos6Plugin extends MavenFlexPlugin implements IMavenFlexPlugi
             return facade.getProjectRelativePath( null /* evaluate( keystoreTag ) */ );
         else
             return null;
-    }
-
-    @Override
-    public IPath getOutputFolderPath()
-    {
-        final Xpp3Dom outputDirectory = null; //configuration.getChild( "outputDirectory" );
-
-        // Checks outputDirectory has been set, e.g. if not returning default value.
-        if (outputDirectory.getValue().equals( "${project.build.outputDirectory}" ))
-        {
-            return facade.getProjectRelativePath( null /*evaluate( outputDirectory )*/ );
-        }
-        else {
-            return new Path(null /*evaluate( outputDirectory )*/);
-        }
     }
 
     /**

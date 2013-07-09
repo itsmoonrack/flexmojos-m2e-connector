@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.NonNull;
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  * @author Sebastien Pinel
  */
-public interface IMavenFlexPlugin
+public interface IMavenFlexPlugin extends ICompilerMojo
 {
 
     /**
@@ -36,21 +36,6 @@ public interface IMavenFlexPlugin
      */
     @NonNull
     IPath[] getSourcePath();
-
-    /**
-     * Gets the target player version.
-     */
-    String getTargetPlayerVersion();
-
-    /**
-     * Gets the main application path.
-     */
-    IPath getMainApplicationPath();
-
-    /**
-     * Gets the output folder path.
-     */
-    IPath getOutputFolderPath();
 
     /**
      * Gets the certificate folder path.

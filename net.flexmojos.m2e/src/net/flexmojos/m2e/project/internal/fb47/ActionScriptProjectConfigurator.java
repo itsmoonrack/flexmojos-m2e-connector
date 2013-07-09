@@ -27,11 +27,8 @@ import com.google.inject.Inject;
 
 public class ActionScriptProjectConfigurator extends AbstractConfigurator
 {
-
     protected IProject project;
-
     protected IProgressMonitor monitor;
-
     protected IMutableActionScriptProjectSettings settings;
 
     @Inject ActionScriptProjectConfigurator( final IMavenFlexPlugin plugin,
@@ -41,12 +38,19 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
         super( plugin );
         this.project = project;
         this.monitor = monitor;
-        this.settings = ActionScriptCore
-                        .createProjectDescription( project.getName(), project.getLocation(), false /* FIXME : hard - coded ! */);
     }
 
     @Override
-    public void saveDescription()
+    protected void createConfiguration()
+    {
+        this.settings = ActionScriptCore
+                            .createProjectDescription( project.getName(),
+                                                       project.getLocation(),
+                                                       false /* FIXME : hard - coded ! */);
+    }
+
+    @Override
+    protected void saveDescription()
     {
     }
 

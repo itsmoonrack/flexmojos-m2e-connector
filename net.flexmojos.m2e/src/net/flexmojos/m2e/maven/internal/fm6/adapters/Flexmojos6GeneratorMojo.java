@@ -1,8 +1,8 @@
 package net.flexmojos.m2e.maven.internal.fm6.adapters;
 
+import net.flexmojos.m2e.maven.IGeneratorMojo;
 import net.flexmojos.m2e.maven.internal.MavenFlexMojo;
 import net.flexmojos.m2e.maven.internal.fm6.GeneratorMojo;
-import net.flexmojos.m2e.maven.internal.fm6.IGeneratorMojo;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;

@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.util.Providers;
 
 /**
  * Maven Flex Plug-in abstract components configuration. Depending on the version of the Plug-in, a specialized version
@@ -42,8 +41,6 @@ public abstract class MavenFlexModule extends AbstractModule
      * Binds <ll>clazz</ll> to its <ll>implementation</ll> when an <ll>annotation</ll> Mojo is found in the list of
      * <ll>goals</ll> executed.
      *
-     * Binds an empty implementation if no Mojo execution is found for the list of goals.
-     *
      * @param clazz
      * @param implementation
      * @param annotation
@@ -65,12 +62,7 @@ public abstract class MavenFlexModule extends AbstractModule
             executions = new LinkedList<MojoExecution>();
         }
 
-        if ( executions.isEmpty() )
-        {
-            bind( clazz )
-                .toProvider( Providers.<T>of( null ) );
-        }
-        else
+        if ( !executions.isEmpty() )
         {
             bind( MojoExecution.class )
                 .annotatedWith( annotation )

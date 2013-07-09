@@ -1,7 +1,7 @@
 package net.flexmojos.m2e.maven.internal.fm6.adapters;
 
+import net.flexmojos.m2e.maven.ISignAirMojo;
 import net.flexmojos.m2e.maven.internal.MavenFlexMojo;
-import net.flexmojos.m2e.maven.internal.fm6.ISignAirMojo;
 import net.flexmojos.m2e.maven.internal.fm6.SignAirMojo;
 
 import org.apache.maven.execution.MavenSession;

@@ -24,6 +24,11 @@ public class ApolloProjectConfigurator
                                        final IProgressMonitor monitor )
     {
         super( plugin, project, monitor );
+    }
+
+    @Override
+    protected void createConfiguration()
+    {
         final IApolloProject apolloProject = ApolloProjectCore.getApolloProject( project );
 
         if ( apolloProject != null )
@@ -41,7 +46,7 @@ public class ApolloProjectConfigurator
     }
 
     @Override
-    public void saveDescription()
+    protected void saveDescription()
     {
         final ApolloProjectSettings apolloProjectSettings = (ApolloProjectSettings) settings;
         apolloProjectSettings.saveDescription( project, monitor );

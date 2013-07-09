@@ -5,7 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import net.flexmojos.m2e.maven.ICompilerMojo;
+import net.flexmojos.m2e.maven.IGeneratorMojo;
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
+import net.flexmojos.m2e.maven.ISignAirMojo;
+import net.flexmojos.m2e.maven.internal.discovery.ServerDiscovery;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
@@ -13,11 +17,16 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
+import com.google.inject.Inject;
+
 public abstract class MavenFlexPlugin implements IMavenFlexPlugin
 {
+    protected final IProgressMonitor monitor;
     protected final IMavenProjectFacade facade;
 
-    protected final IProgressMonitor monitor;
+    @Inject protected ICompilerMojo compiler;
+    @Inject(optional = true) protected IGeneratorMojo generator;
+    @Inject(optional = true) protected ISignAirMojo signAir;
 
     protected MavenFlexPlugin( final IMavenProjectFacade facade,
                                final IProgressMonitor monitor )
@@ -87,22 +96,40 @@ public abstract class MavenFlexPlugin implements IMavenFlexPlugin
     @Override
     public String getTargetPlayerVersion()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return compiler.getTargetPlayerVersion();
     }
 
     @Override
     public IPath getMainApplicationPath()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return compiler.getMainApplicationPath();
+    }
+
+    @Override
+    public boolean hasOutputFolderPath()
+    {
+        return compiler.hasOutputFolderPath();
     }
 
     @Override
     public IPath getOutputFolderPath()
     {
-        // TODO Auto-generated method stub
-        return null;
+        final IPath outputFolderPath = compiler.getOutputFolderPath();
+        final IPath outputDirectory = facade.getProjectRelativePath( outputFolderPath.toString() );
+
+        // Checks the outputFolder property has been set or not.
+        if ( !compiler.hasOutputFolderPath() )
+        {
+            // If it does not, triggers the strategy finder.
+            final ServerDiscovery discovery = new ServerDiscovery();
+            if ( discovery.hasServer( facade.getMavenProject() ) )
+            {
+                return discovery.getOutputFolderPath();
+            }
+        }
+
+        // Returns either a relative or an absolute path.
+        return outputDirectory != null ? outputDirectory : outputFolderPath;
     }
 
     @Override
