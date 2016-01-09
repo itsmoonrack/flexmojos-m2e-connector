@@ -2,8 +2,6 @@ package net.flexmojos.m2e.maven;
 
 import java.util.Map;
 
-import net.flexmojos.m2e.maven.internal.fm6.Flexmojos6Module;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
@@ -14,6 +12,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+
+import net.flexmojos.m2e.maven.internal.fm7.Flexmojos7Module;
 
 /**
  * This module is responsible of binding maven common dependencies such as IMavenProjectFacade, MavenSession, and so on.
@@ -82,10 +82,11 @@ public class MavenFlexModule extends AbstractModule
 
         switch ( Character.getNumericValue( plugin.getVersion().charAt( 0 ) ) )
         {
+            case 7:
             case 6:
             case 5: // TODO: test this is really supported.
             case 4: // TODO: test this is really supported.
-                install( new Flexmojos6Module( facade, monitor ) );
+                install( new Flexmojos7Module( facade, monitor ) );
                 break;
 
             default:

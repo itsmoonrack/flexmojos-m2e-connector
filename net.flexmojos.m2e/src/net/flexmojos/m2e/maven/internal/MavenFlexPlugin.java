@@ -81,7 +81,7 @@ public abstract class MavenFlexPlugin implements IMavenFlexPlugin
     @Override
     public IPath[] getSourcePath()
     {
-        final List<IPath> classPath = new ArrayList<IPath>( Arrays.asList( facade.getResourceLocations() ) );
+        final List<IPath> classPath = new ArrayList<IPath>( Arrays.asList( facade.getCompileSourceLocations() ) );
 
         // Test source directory is treated as a supplementary source path entry so tests can execute in Eclipse.
         final IPath testSourceDirectory = facade.getProjectRelativePath( getBuild().getTestSourceDirectory() );

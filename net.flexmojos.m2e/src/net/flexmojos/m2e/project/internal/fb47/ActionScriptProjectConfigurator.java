@@ -21,6 +21,7 @@ import com.adobe.flexbuilder.project.ClassPathEntryFactory;
 import com.adobe.flexbuilder.project.IClassPathEntry;
 import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
+import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.common.CrossDomainRslEntry;
 import com.adobe.flexbuilder.util.FlashPlayerVersion;
 import com.google.inject.Inject;
@@ -52,6 +53,8 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
     @Override
     protected void saveDescription()
     {
+        final ActionScriptProjectSettings actionScriptProjectSettings = (ActionScriptProjectSettings) settings;
+        actionScriptProjectSettings.saveDescription( project, monitor );
     }
 
     @Override

@@ -37,7 +37,6 @@
     <module>net.flexmojos.m2e.feature</module>
 
     <module>net.flexmojos.m2e.site</module>
-    <module>net.flexmojos.m2e.test</module>
   </modules>
 
   <dependencies>

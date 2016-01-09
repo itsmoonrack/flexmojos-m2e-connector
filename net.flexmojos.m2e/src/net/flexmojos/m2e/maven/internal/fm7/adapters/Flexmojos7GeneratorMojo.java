@@ -1,8 +1,8 @@
-package net.flexmojos.m2e.maven.internal.fm6.adapters;
+package net.flexmojos.m2e.maven.internal.fm7.adapters;
 
 import net.flexmojos.m2e.maven.IGeneratorMojo;
 import net.flexmojos.m2e.maven.internal.MavenFlexMojo;
-import net.flexmojos.m2e.maven.internal.fm6.GeneratorMojo;
+import net.flexmojos.m2e.maven.internal.fm7.GeneratorMojo;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
@@ -12,10 +12,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.inject.Inject;
 
-public class Flexmojos6GeneratorMojo extends MavenFlexMojo implements IGeneratorMojo
+public class Flexmojos7GeneratorMojo extends MavenFlexMojo implements IGeneratorMojo
 {
 
-    @Inject Flexmojos6GeneratorMojo( final MavenSession session,
+    @Inject Flexmojos7GeneratorMojo( final MavenSession session,
                                      final @GeneratorMojo @Nullable MojoExecution mojoExecution )
     {
         super( session, mojoExecution );

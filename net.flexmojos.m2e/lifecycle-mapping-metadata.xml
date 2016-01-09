@@ -8,7 +8,7 @@
 			<pluginExecutionFilter>
 				<groupId>net.flexmojos.oss</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
-				<versionRange>[5.0,7.0)</versionRange>
+				<versionRange>[5.0,7.1)</versionRange>
 				<goals>
 					<goal>test-compile</goal>
 					<goal>compile-swc</goal>
