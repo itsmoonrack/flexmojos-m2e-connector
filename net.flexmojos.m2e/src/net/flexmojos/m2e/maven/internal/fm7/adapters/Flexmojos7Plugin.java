@@ -1,4 +1,4 @@
-package net.flexmojos.m2e.maven.internal.fm6.adapters;
+package net.flexmojos.m2e.maven.internal.fm7.adapters;
 
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 
@@ -21,15 +21,15 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import com.google.inject.Inject;
 
 /**
- * Implementation of the Flexmojos 6.x plugin.
+ * Implementation of the Flexmojos 7.x plugin.
  *
  * @author Sylvain Lecoy (sylvain.lecoy@gmail.com)
  * @author Sebastien Pinel
  */
-public class Flexmojos6Plugin extends MavenFlexPlugin implements IMavenFlexPlugin
+public class Flexmojos7Plugin extends MavenFlexPlugin implements IMavenFlexPlugin
 {
 
-    @Inject Flexmojos6Plugin( final IMavenProjectFacade facade,
+    @Inject Flexmojos7Plugin( final IMavenProjectFacade facade,
                               final IProgressMonitor monitor )
     {
         super( facade, monitor );

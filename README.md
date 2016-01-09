@@ -97,8 +97,8 @@ Contributing to the project necessitate some configuration, follow the steps bel
 Architecture
 ------------
 
-The project uses a Bridge pattern which decouple the ProjectConfigurator from its MavenFlexPlugin. This pattern is used to cover the product and version space of different version of Flash Builder (4.0, 4.5, 4.6 and 4.7) but also different version of Maven Flex Plugin (Flexmojos 4.x, 5.x and 6.x, and MavenFlexPlugin 1.0).
+The project uses a Bridge pattern which decouple the ProjectConfigurator from its MavenFlexPlugin. This pattern is used to cover the product and version space of different version of Flash Builder (4.0, 4.5, 4.6 and 4.7) but also different version of Maven Flex Plugin (Flexmojos 4.x, 5.x, 6.x and 7.x, and MavenFlexPlugin 1.0).
 
-The bridge pattern is useful when both the class defining the implementation for different product and what it does vary often. The class itself can be thought of as the implementation and what the class do as the abstraction. It can also be thought of as two layers of abstraction. This pattern is often confused with the adapter pattern. In fact, the bridge pattern is implemented using the class adapter pattern, e.g. the Flexmojos6Adapter.
+The bridge pattern is useful when both the class defining the implementation for different product and what it does vary often. The class itself can be thought of as the implementation and what the class do as the abstraction. It can also be thought of as two layers of abstraction. This pattern is often confused with the adapter pattern. In fact, the bridge pattern is implemented using the class adapter pattern, e.g. the Flexmojos7Adapter.
 
 To wire this configuration of classes, the project is using Dependency Injection through com.google.inject and JSR specification. When a Right Click > Update Project configuration is requested, the class responsible for configuring the container select a compatible adapter plugin for FlexMavenPlugin from the pom artifacts. The configuration of the refined class for project configurator is selected at eclipse plugin load time.

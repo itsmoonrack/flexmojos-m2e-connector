@@ -1,8 +1,8 @@
-package net.flexmojos.m2e.maven.internal.fm6.adapters;
+package net.flexmojos.m2e.maven.internal.fm7.adapters;
 
 import net.flexmojos.m2e.maven.ICompilerMojo;
 import net.flexmojos.m2e.maven.internal.MavenFlexMojo;
-import net.flexmojos.m2e.maven.internal.fm6.CompilerMojo;
+import net.flexmojos.m2e.maven.internal.fm7.CompilerMojo;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
@@ -11,10 +11,10 @@ import org.eclipse.core.runtime.Path;
 
 import com.google.inject.Inject;
 
-public class Flexmojos6CompilerMojo extends MavenFlexMojo implements ICompilerMojo
+public class Flexmojos7CompilerMojo extends MavenFlexMojo implements ICompilerMojo
 {
 
-    @Inject Flexmojos6CompilerMojo( final MavenSession session,
+    @Inject Flexmojos7CompilerMojo( final MavenSession session,
                                     final @CompilerMojo MojoExecution mojoExecution )
     {
         super( session, mojoExecution );
