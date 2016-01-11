@@ -26,10 +26,20 @@ public interface IMavenFlexPlugin extends ICompilerMojo
     IPath getMainSourceFolder();
 
     /**
+     * Gets Flash Framework artifact.
+     */
+    Artifact getFlashFramework();
+
+    /**
+     * Gets Air Framework artifact.
+     */
+    Artifact getAirFramework();
+
+    /**
      * Gets Flex Framework artifact.
      */
     Artifact getFlexFramework();
-
+    
     /**
      * Gets the source path so the testSourceDirectory, and additional resources locations such as default
      * src/main/resources or baseOutputDirectory for "generate" goal are added to the class path.

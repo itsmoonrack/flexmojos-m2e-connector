@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import com.adobe.flexbuilder.project.FlexProjectManager;
 import com.adobe.flexbuilder.project.IFlexLibraryProject;
 import com.adobe.flexbuilder.project.XMLNamespaceManifestPath;
+import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
 import com.adobe.flexbuilder.project.internal.FlexLibraryProjectSettings;
 import com.google.inject.Inject;
 
@@ -28,7 +29,7 @@ extends AbstractFlexProjectConfigurator
     @Override
     protected void createConfiguration()
     {
-        final IFlexLibraryProject flexProject = (IFlexLibraryProject) FlexProjectManager.getFlexProject( project );
+        final IFlexLibraryProject flexProject = (IFlexLibraryProject) ActionScriptCore.getProject( project );
         // Checks if project already exists.
         if ( flexProject != null )
         {
@@ -53,25 +54,38 @@ extends AbstractFlexProjectConfigurator
     }
 
     @Override
+    protected void configureSDKUse()
+    {
+        settings.setUseFlashSDK( plugin.getFlexFramework() == null );
+        settings.setUseAIRConfig( plugin.getAirFramework() != null );
+    }
+
+    @Override
     protected void configureLibraryPath()
     {
-        super.configureFlexSDKName();
+        if ( plugin.getFlexFramework() != null )
+        {
+            super.configureFlexSDKName();
+        }
         super.configureLibraryPath();
     }
 
     protected void configureManifest()
     {
-        final Map<String, IPath> namespaces = plugin.getXMLNamespaceManifestPath();
-        final XMLNamespaceManifestPath[] paths = new XMLNamespaceManifestPath[namespaces.size()];
-        int iterator = 0;
-
-        for (final Map.Entry<String, IPath> namespace : namespaces.entrySet())
+        if ( plugin.getFlexFramework() != null )
         {
-            // Converts <String, IPath> to XMLNamespaceManifestPath.
-            paths[iterator++] = new XMLNamespaceManifestPath( namespace.getKey(), namespace.getValue() );
+            final Map<String, IPath> namespaces = plugin.getXMLNamespaceManifestPath();
+            final XMLNamespaceManifestPath[] paths = new XMLNamespaceManifestPath[namespaces.size()];
+            int iterator = 0;
+    
+            for (final Map.Entry<String, IPath> namespace : namespaces.entrySet())
+            {
+                // Converts <String, IPath> to XMLNamespaceManifestPath.
+                paths[iterator++] = new XMLNamespaceManifestPath( namespace.getKey(), namespace.getValue() );
+            }
+    
+            ((FlexLibraryProjectSettings) settings).setManifestPaths( paths );
         }
-
-        ((FlexLibraryProjectSettings) settings).setManifestPaths( paths );
     }
 
     @Override
@@ -80,6 +94,9 @@ extends AbstractFlexProjectConfigurator
      */
     public void configure()
     {
+        createConfiguration();
+
+        configureSDKUse();
         configureMainSourceFolder();
         configureSourcePath();
         configureLibraryPath();
@@ -88,6 +105,8 @@ extends AbstractFlexProjectConfigurator
         configureTargetPlayerVersion();
         configureMainApplicationPath();
         configureAdditionalCompilerArgs();
+
+        saveDescription();
     }
 
 }

@@ -26,6 +26,11 @@ public abstract class AbstractConfigurator
     }
 
     /**
+     * Configures the SDK use.
+     */
+    protected abstract void configureSDKUse();
+
+    /**
      * Configures the main source folder.
      */
     protected abstract void configureMainSourceFolder();
@@ -77,6 +82,7 @@ public abstract class AbstractConfigurator
     {
         createConfiguration();
 
+        configureSDKUse();
         configureMainSourceFolder();
         configureSourcePath();
         configureOutputFolderPath();

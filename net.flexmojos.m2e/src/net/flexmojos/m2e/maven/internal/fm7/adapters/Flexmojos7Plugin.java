@@ -136,38 +136,4 @@ public class Flexmojos7Plugin extends MavenFlexPlugin implements IMavenFlexPlugi
             return null;
     }
 
-    /**
-     * Returns <tt>true</tt> if this artifact belongs to Air Framework.
-     *
-     * @param artifact The artifact to test.
-     * @return <tt>true</tt> if this artifact belongs to Air Framework.
-     */
-    protected boolean isAirFramework( final Artifact artifact )
-    {
-        return artifact.getGroupId().startsWith( "com.adobe.air.framework" );
-    }
-
-    /**
-     * Returns <tt>true</tt> if this artifact belongs to Flash Framework.
-     *
-     * @param artifact The artifact to test.
-     * @return <tt>true</tt> if this artifact belongs to Flash Framework.
-     */
-    protected boolean isFlashFramework( final Artifact artifact )
-    {
-        return artifact.getGroupId().startsWith( "com.adobe.flash.framework" );
-    }
-
-    /**
-     * Returns <tt>true</tt> if this artifact belongs to Flex Framework.
-     *
-     * @param artifact The artifact to test.
-     * @return <tt>true</tt> if this artifact belongs to Flex Framework.
-     */
-    protected boolean isFlexFramework( final Artifact artifact )
-    {
-        return artifact.getGroupId().startsWith( "com.adobe.flex.framework" )
-            || artifact.getGroupId().startsWith( "org.apache.flex.framework" );
-    }
-
 }

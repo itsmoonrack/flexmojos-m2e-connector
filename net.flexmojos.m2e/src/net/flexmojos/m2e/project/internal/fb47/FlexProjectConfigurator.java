@@ -9,6 +9,7 @@ import com.adobe.flexbuilder.project.FlexProjectManager;
 import com.adobe.flexbuilder.project.FlexServerType;
 import com.adobe.flexbuilder.project.IClassPathEntry;
 import com.adobe.flexbuilder.project.IFlexProject;
+import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
 import com.adobe.flexbuilder.project.internal.FlexProjectSettings;
 import com.google.inject.Inject;
 
@@ -26,7 +27,7 @@ public class FlexProjectConfigurator
     @Override
     protected void createConfiguration()
     {
-        final IFlexProject flexProject = FlexProjectManager.getFlexProject( project );
+        final IFlexProject flexProject = (IFlexProject) ActionScriptCore.getProject( project );
         // Checks if project already exists.
         if ( flexProject != null )
         {
@@ -49,6 +50,13 @@ public class FlexProjectConfigurator
     {
         final FlexProjectSettings flexProjectSettings = (FlexProjectSettings) settings;
         flexProjectSettings.saveDescription( project, monitor );
+    }
+
+    @Override
+    protected void configureSDKUse()
+    {
+        settings.setUseFlashSDK( false );
+        settings.setUseAIRConfig( false );
     }
 
     @Override

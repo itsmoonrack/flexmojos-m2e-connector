@@ -45,7 +45,7 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
     @Override
     protected void createConfiguration()
     {
-        final IActionScriptProject actionScriptProject = ActionScriptCore.getProject( project );
+        final IActionScriptProject actionScriptProject = (IActionScriptProject) ActionScriptCore.getProject( project );
         // Checks if project already exists.
         if ( actionScriptProject != null )
         {
@@ -67,6 +67,13 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
     {
         final ActionScriptProjectSettings actionScriptProjectSettings = (ActionScriptProjectSettings) settings;
         actionScriptProjectSettings.saveDescription( project, monitor );
+    }
+
+    @Override
+    protected void configureSDKUse()
+    {
+        settings.setUseFlashSDK( true );
+        settings.setUseAIRConfig( false );
     }
 
     @Override

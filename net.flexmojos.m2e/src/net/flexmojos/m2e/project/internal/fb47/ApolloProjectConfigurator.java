@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.adobe.flexbuilder.project.FlexServerType;
+import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
 import com.adobe.flexbuilder.project.air.ApolloProjectCore;
 import com.adobe.flexbuilder.project.air.IApolloProject;
 import com.adobe.flexbuilder.project.air.export.ILaunchParameter;
@@ -29,7 +30,7 @@ public class ApolloProjectConfigurator
     @Override
     protected void createConfiguration()
     {
-        final IApolloProject apolloProject = ApolloProjectCore.getApolloProject( project );
+        final IApolloProject apolloProject = (IApolloProject) ActionScriptCore.getProject( project );
         // Checks if project already exists.
         if ( apolloProject != null )
         {
@@ -51,6 +52,13 @@ public class ApolloProjectConfigurator
     {
         final ApolloProjectSettings apolloProjectSettings = (ApolloProjectSettings) settings;
         apolloProjectSettings.saveDescription( project, monitor );
+    }
+
+    @Override
+    protected void configureSDKUse()
+    {
+        settings.setUseFlashSDK( false );
+        settings.setUseAIRConfig( true );
     }
 
     @Override
@@ -84,6 +92,9 @@ public class ApolloProjectConfigurator
     @Override
     public void configure()
     {
+        createConfiguration();
+
+        configureSDKUse();
         configureMainSourceFolder();
         configureSourcePath();
         configureOutputFolderPath();
@@ -93,5 +104,7 @@ public class ApolloProjectConfigurator
         configureTargetPlayerVersion();
         configureMainApplicationPath();
         configureAdditionalCompilerArgs();
+
+        saveDescription();
     }
 }
