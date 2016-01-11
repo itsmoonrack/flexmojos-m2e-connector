@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import com.adobe.flexbuilder.project.ClassPathEntryFactory;
 import com.adobe.flexbuilder.project.IClassPathEntry;
 import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
+import com.adobe.flexbuilder.project.actionscript.IActionScriptProject;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.common.CrossDomainRslEntry;
@@ -44,10 +45,21 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
     @Override
     protected void createConfiguration()
     {
-        this.settings = ActionScriptCore
+        final IActionScriptProject actionScriptProject = ActionScriptCore.getProject( project );
+        // Checks if project already exists.
+        if ( actionScriptProject != null )
+        {
+            // If it does, reuse the settings.
+            settings = actionScriptProject.getProjectSettingsClone();
+        }
+        else
+        {
+            // If it does not, create new settings.
+            settings = ActionScriptCore
                             .createProjectDescription( project.getName(),
                                                        project.getLocation(),
                                                        false /* FIXME : hard - coded ! */);
+        }
     }
 
     @Override

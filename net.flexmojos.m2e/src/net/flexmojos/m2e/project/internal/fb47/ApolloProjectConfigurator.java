@@ -30,9 +30,10 @@ public class ApolloProjectConfigurator
     protected void createConfiguration()
     {
         final IApolloProject apolloProject = ApolloProjectCore.getApolloProject( project );
-
+        // Checks if project already exists.
         if ( apolloProject != null )
         {
+            // If it does, reuse the settings.
             settings = apolloProject.getFlexProjectSettingsClone();
         }
         else
