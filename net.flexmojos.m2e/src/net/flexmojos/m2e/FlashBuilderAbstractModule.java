@@ -1,12 +1,17 @@
 package net.flexmojos.m2e;
 
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWF;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static net.flexmojos.oss.plugin.common.FlexExtension.AIR;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 import net.flexmojos.m2e.maven.MavenFlexModule;
 import net.flexmojos.m2e.project.AbstractConfigurator;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -55,6 +60,12 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
         // Installs the facade to maven project, by configuring a concrete module depending on the version of the Maven
         // Flex Plug-in available.
         install( facade );
+        
+        removeNature( project, "com.adobe.flexbuilder.project.flexnature", monitor );
+        removeNature( project, "com.adobe.flexbuilder.project.apollonature", monitor );
+        removeNature( project, "com.adobe.flexbuilder.project.flexlibnature", monitor );
+        removeNature( project, "com.adobe.flexbuilder.project.aslibnature", monitor );
+        removeNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
 
         // Result of this algorithm. We add all nature directly.
         Class<? extends AbstractConfigurator> configurator;
@@ -165,6 +176,32 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
         try
         {
             org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator.addNature( project, natureId, monitor );
+        }
+        catch ( final CoreException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+    
+    private void removeNature( final IProject project, final String natureId, final IProgressMonitor monitor )
+    {
+        try
+        {
+            if ( project.hasNature( natureId ) )
+            {
+                IProjectDescription description = project.getDescription();
+                String[] prevNatures = description.getNatureIds();
+                List<String> newNatures = new ArrayList<String>();
+                for ( String nature : prevNatures )
+                {
+                    if ( !nature.equals( natureId ) )
+                    {
+                        newNatures.add( nature );
+                    }
+                }
+                description.setNatureIds( newNatures.toArray( new String[newNatures.size()] ) );
+                project.setDescription(description, monitor);
+            }
         }
         catch ( final CoreException e )
         {

@@ -5,6 +5,7 @@ import java.util.Map;
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -12,6 +13,8 @@ import com.adobe.flexbuilder.project.FlexProjectManager;
 import com.adobe.flexbuilder.project.IFlexLibraryProject;
 import com.adobe.flexbuilder.project.XMLNamespaceManifestPath;
 import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
+import com.adobe.flexbuilder.project.actionscript.IActionScriptProject;
+import com.adobe.flexbuilder.project.internal.FlexLibraryProject;
 import com.adobe.flexbuilder.project.internal.FlexLibraryProjectSettings;
 import com.google.inject.Inject;
 
@@ -29,11 +32,14 @@ extends AbstractFlexProjectConfigurator
     @Override
     protected void createConfiguration()
     {
-        final IFlexLibraryProject flexProject = (IFlexLibraryProject) ActionScriptCore.getProject( project );
+        final IActionScriptProject unknownProject = ActionScriptCore.getProject( project );
+        final IFlexLibraryProject flexProject = unknownProject.getClass() == FlexLibraryProject.class
+            ? (IFlexLibraryProject) unknownProject : null;
         // Checks if project already exists.
         if ( flexProject != null )
         {
-            // If it does, reuse the settings.
+            // If it does, reuse the settings and project.
+            adobeProject = flexProject;
             settings = flexProject.getFlexLibraryProjectSettingsClone();
         }
         else
@@ -42,15 +48,31 @@ extends AbstractFlexProjectConfigurator
             settings = FlexProjectManager
                             .createFlexLibraryProjectDescription( project.getName(),
                                                                   project.getLocation(),
-                                                                  false /* FIXME: hard-coded ! */);
+                                                                  false, /* FIXME: hard-coded ! */
+                                                                  false, /* FIXME: hard-coded ! */
+                                                                  false, /* FIXME: hard-coded ! */
+                                                                  plugin.getFlexFramework() == null);
         }
     }
 
     @Override
     protected void saveDescription()
     {
-        final FlexLibraryProjectSettings flexProjectSettings = (FlexLibraryProjectSettings) settings;
-        flexProjectSettings.saveDescription( project, monitor );
+        final FlexLibraryProjectSettings flexLibProjectSettings = (FlexLibraryProjectSettings) settings;
+        flexLibProjectSettings.saveDescription( project, monitor );
+
+        // Creats project if dose not exists
+        if ( adobeProject == null )
+        {
+            try
+            {
+                adobeProject = new FlexLibraryProject( flexLibProjectSettings, project, monitor );
+            }
+            catch ( final CoreException e )
+            {
+                throw new RuntimeException( e );
+            }
+        }
     }
 
     @Override

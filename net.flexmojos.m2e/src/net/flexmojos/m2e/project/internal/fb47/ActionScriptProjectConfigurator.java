@@ -14,6 +14,7 @@ import net.flexmojos.m2e.project.AbstractConfigurator;
 import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -22,6 +23,7 @@ import com.adobe.flexbuilder.project.IClassPathEntry;
 import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
 import com.adobe.flexbuilder.project.actionscript.IActionScriptProject;
 import com.adobe.flexbuilder.project.actionscript.IMutableActionScriptProjectSettings;
+import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProject;
 import com.adobe.flexbuilder.project.actionscript.internal.ActionScriptProjectSettings;
 import com.adobe.flexbuilder.project.common.CrossDomainRslEntry;
 import com.adobe.flexbuilder.util.FlashPlayerVersion;
@@ -31,6 +33,7 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
 {
     protected IProject project;
     protected IProgressMonitor monitor;
+    protected IActionScriptProject adobeProject;
     protected IMutableActionScriptProjectSettings settings;
 
     @Inject ActionScriptProjectConfigurator( final IMavenFlexPlugin plugin,
@@ -45,11 +48,14 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
     @Override
     protected void createConfiguration()
     {
-        final IActionScriptProject actionScriptProject = (IActionScriptProject) ActionScriptCore.getProject( project );
+        final IActionScriptProject unknownProject = ActionScriptCore.getProject( project );
+        final IActionScriptProject actionScriptProject = unknownProject.getClass() == ActionScriptProject.class
+            ? (IActionScriptProject) unknownProject : null;
         // Checks if project already exists.
         if ( actionScriptProject != null )
         {
-            // If it does, reuse the settings.
+            // If it does, reuse the settings and project.
+            adobeProject = actionScriptProject;
             settings = actionScriptProject.getProjectSettingsClone();
         }
         else
@@ -67,6 +73,19 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
     {
         final ActionScriptProjectSettings actionScriptProjectSettings = (ActionScriptProjectSettings) settings;
         actionScriptProjectSettings.saveDescription( project, monitor );
+
+        // Creats project if dose not exists
+        if ( adobeProject == null )
+        {
+            try
+            {
+                adobeProject = new ActionScriptProject( actionScriptProjectSettings, project, monitor );
+            }
+            catch ( final CoreException e )
+            {
+                throw new RuntimeException( e );
+            }
+        }
     }
 
     @Override
