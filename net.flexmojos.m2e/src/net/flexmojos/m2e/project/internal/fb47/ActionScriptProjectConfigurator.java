@@ -184,15 +184,18 @@ public class ActionScriptProjectConfigurator extends AbstractConfigurator
             final IClassPathEntry entry =
                             ClassPathEntryFactory.newEntry( IClassPathEntry.KIND_LIBRARY_FILE, path, settings );
 
-            if ( scope.equals( "rsl" ) && ( project instanceof FlexProjectConfigurator ) )
+            if ( scope.equals( "rsl" ) && ( this instanceof FlexProjectConfigurator ) )
             {
                 entry.setLinkType( IClassPathEntry.LINK_TYPE_CROSS_DOMAIN_RSL );
-                entry.setCrossDomainRsls( new CrossDomainRslEntry[] { new CrossDomainRslEntry( artifact.getArtifactId()
-                                                                                               + ".swf", "", true ) } );
+                entry.setCrossDomainRsls( new CrossDomainRslEntry[] { new CrossDomainRslEntry( artifact.getFile().getName(), "", true ) } );
             }
-            else if (scope.equals( "internal" ))
+            else if ( scope.equals( "internal" ) || scope.equals( "merged" ) )
             {
                 entry.setLinkType( IClassPathEntry.LINK_TYPE_INTERNAL );
+            }
+            else
+            {
+                entry.setLinkType( IClassPathEntry.LINK_TYPE_EXTERNAL );
             }
 
             if ( !scope.equals( "test" ) )
