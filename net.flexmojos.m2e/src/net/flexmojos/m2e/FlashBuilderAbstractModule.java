@@ -1,11 +1,17 @@
 package net.flexmojos.m2e;
 
+import static net.flexmojos.oss.plugin.common.FlexExtension.SWF;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static net.flexmojos.oss.plugin.common.FlexExtension.AIR;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 import net.flexmojos.m2e.maven.MavenFlexModule;
 import net.flexmojos.m2e.project.AbstractConfigurator;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -54,61 +60,95 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
         // Installs the facade to maven project, by configuring a concrete module depending on the version of the Maven
         // Flex Plug-in available.
         install( facade );
+        
+        removeNature( project, "com.adobe.flexbuilder.project.flexnature", monitor );
+        removeNature( project, "com.adobe.flexbuilder.project.apollonature", monitor );
+        removeNature( project, "com.adobe.flexbuilder.project.flexlibnature", monitor );
+        removeNature( project, "com.adobe.flexbuilder.project.aslibnature", monitor );
+        removeNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
 
-        // Adds the ActionScript nature.
-        addNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
-        // Sets the base project configurator to an ActionScript project configurator. While a project can have multiple
-        // natures, a project can not have more than one configurator. The algorithm bellow is based on "the last
-        // assignment is the right one" adding natures to the project as the execution flow goes into the branches but
-        // overriding configurators to eventually define the project.
-        Class<? extends AbstractConfigurator> configurator = getActionScriptProjectConfiguratorClass();
-
-        if ( facade.isApolloProject() )
+        // Result of this algorithm. We add all nature directly.
+        Class<? extends AbstractConfigurator> configurator;
+        
+        // Which framework we have is not the point of the project should be what style. Packaging directly affect which
+        // project style we use.
+        
+        // Web project
+        boolean isFlash = SWF.equals( facade.getPackaging() );
+        // Desktop project
+        boolean isApollo = AIR.equals( facade.getPackaging() );
+        // Library project
+        boolean isLibrary = SWC.equals( facade.getPackaging() );
+        
+        // Useless
+        @SuppressWarnings("unused")
+        boolean hasFlashFramework = facade.hasFlashFramework();
+        // Useless
+        @SuppressWarnings("unused")
+        boolean hasAirFramework = facade.hasAirFramework();
+        // If we have Flex framework. Project style should be flex project.
+        boolean hasFlexFramework = facade.hasFlexFramework();
+        
+        if ( isFlash )
         {
-            // An Apollo project exists in two flavors: ApolloActionScriptProject, and ApolloProject. While the former
-            // directly extends from ActionScriptProject, the later inherits from FlexProject, so it is perfectly
-            // possible for an Apollo project to have a Flex nature as well.
-            addNature( project, "com.adobe.flexbuilder.project.apollonature", monitor );
-            // The configurator will replace the ActionScript project configurator initially set by an
-            // ApolloActionScript project configurator. Later in the execution flow, in the case a
-            // project have the Flex nature as well, the configurator will be replaced by a "pure" Apollo project
-            // configurator.
-            configurator = getApolloActionScriptProjectConfiguratorClass();
-        }
-
-        if ( facade.isFlexProject() )
-        {
-            // Depending on the packaging, a Flex project can be a FlexLibraryProject (SWC), a FlexProject (SWF) or an
-            // ApolloProject (AIR).
-            if ( SWC.equals( facade.getPackaging() ) )
+            if ( hasFlexFramework )
             {
-                addNature( project, "com.adobe.flexbuilder.project.flexlibnature", monitor );
-                configurator = getFlexLibraryProjectConfiguratorClass();
-                // End of algorithm.
+                // Flex Web Style
+                addNature( project, "com.adobe.flexbuilder.project.flexnature", monitor );
+                addNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
+                
+                configurator = getFlexProjectConfiguratorClass();
             }
             else
             {
-                // An AIR and SWF packaging indicates respectively an ApolloProject and a FlexProject, in both case the
-                // Flex nature is added to the project.
-                addNature( project, "com.adobe.flexbuilder.project.flexnature", monitor );
-                if ( AIR.equals( facade.getPackaging() ) )
-                {
-                    configurator = getApolloProjectConfiguratorClass();
-                    // End of algorithm.
-                }
-                else
-                {
-                    configurator = getFlexProjectConfiguratorClass();
-                    // End of algorithm.
-                }
+                // ActionScript Web Style
+                addNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
+                
+                configurator = getActionScriptProjectConfiguratorClass();
             }
         }
-        else if ( SWC.equals( facade.getPackaging() ) )
+        else if ( isApollo )
         {
-            // In the case there is no declared Flex dependencies, and the packaging is SWC, its an ActionScriptProject
-            // with an aslib nature.
-            addNature( project, "com.adobe.flexbuilder.project.aslibnature", monitor );
-            // End of algorithm.
+            if ( hasFlexFramework )
+            {
+                // Flex Desktop Style
+                addNature( project, "com.adobe.flexbuilder.project.flexnature", monitor );
+                addNature( project, "com.adobe.flexbuilder.project.apollonature", monitor );
+                addNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
+                
+                configurator = getApolloProjectConfiguratorClass();
+            }
+            else
+            {
+                // ActionScript Desktop Style
+                addNature( project, "com.adobe.flexbuilder.project.apollonature", monitor );
+                addNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
+                
+                configurator = getApolloActionScriptProjectConfiguratorClass();
+            }
+        }
+        else if ( isLibrary )
+        {
+            if ( hasFlexFramework )
+            {
+                // Flex Library Style
+                addNature( project, "com.adobe.flexbuilder.project.flexlibnature", monitor );
+                addNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
+                
+                configurator = getFlexLibraryProjectConfiguratorClass();
+            }
+            else
+            {
+                // ActionScript Library Style
+                addNature( project, "com.adobe.flexbuilder.project.aslibnature", monitor );
+                addNature( project, "com.adobe.flexbuilder.project.actionscriptnature", monitor );
+                
+                configurator = getFlexLibraryProjectConfiguratorClass();
+            }
+        }
+        else
+        {
+            throw new AssertionError("Unknown packaging type");
         }
 
         bind( AbstractConfigurator.class ).to( configurator );
@@ -136,6 +176,32 @@ public abstract class FlashBuilderAbstractModule extends AbstractModule
         try
         {
             org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator.addNature( project, natureId, monitor );
+        }
+        catch ( final CoreException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+    
+    private void removeNature( final IProject project, final String natureId, final IProgressMonitor monitor )
+    {
+        try
+        {
+            if ( project.hasNature( natureId ) )
+            {
+                IProjectDescription description = project.getDescription();
+                String[] prevNatures = description.getNatureIds();
+                List<String> newNatures = new ArrayList<String>();
+                for ( String nature : prevNatures )
+                {
+                    if ( !nature.equals( natureId ) )
+                    {
+                        newNatures.add( nature );
+                    }
+                }
+                description.setNatureIds( newNatures.toArray( new String[newNatures.size()] ) );
+                project.setDescription(description, monitor);
+            }
         }
         catch ( final CoreException e )
         {

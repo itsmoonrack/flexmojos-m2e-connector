@@ -3,12 +3,16 @@ package net.flexmojos.m2e.project.internal.fb47;
 import net.flexmojos.m2e.maven.IMavenFlexPlugin;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.adobe.flexbuilder.project.FlexProjectManager;
 import com.adobe.flexbuilder.project.FlexServerType;
 import com.adobe.flexbuilder.project.IClassPathEntry;
 import com.adobe.flexbuilder.project.IFlexProject;
+import com.adobe.flexbuilder.project.actionscript.ActionScriptCore;
+import com.adobe.flexbuilder.project.actionscript.IActionScriptProject;
+import com.adobe.flexbuilder.project.internal.FlexProject;
 import com.adobe.flexbuilder.project.internal.FlexProjectSettings;
 import com.google.inject.Inject;
 
@@ -26,11 +30,14 @@ public class FlexProjectConfigurator
     @Override
     protected void createConfiguration()
     {
-        final IFlexProject flexProject = FlexProjectManager.getFlexProject( project );
+        final IActionScriptProject unknownProject = ActionScriptCore.getProject( project );
+        final IFlexProject flexProject = unknownProject.getClass() == FlexProject.class
+            ? (IFlexProject) unknownProject : null;
         // Checks if project already exists.
         if ( flexProject != null )
         {
-            // If it does, reuse the settings.
+            // If it does, reuse the settings and project.
+            adobeProject = flexProject;
             settings = flexProject.getFlexProjectSettingsClone();
         }
         else
@@ -49,6 +56,26 @@ public class FlexProjectConfigurator
     {
         final FlexProjectSettings flexProjectSettings = (FlexProjectSettings) settings;
         flexProjectSettings.saveDescription( project, monitor );
+
+        // Creats project if dose not exists
+        if ( adobeProject == null )
+        {
+            try
+            {
+                adobeProject = new FlexProject( flexProjectSettings, project, monitor );
+            }
+            catch ( final CoreException e )
+            {
+                throw new RuntimeException( e );
+            }
+        }
+    }
+
+    @Override
+    protected void configureSDKUse()
+    {
+        settings.setUseFlashSDK( false );
+        settings.setUseAIRConfig( false );
     }
 
     @Override

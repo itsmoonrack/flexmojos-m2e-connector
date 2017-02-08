@@ -13,6 +13,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
+import net.flexmojos.m2e.maven.internal.MavenFlexPlugin;
 import net.flexmojos.m2e.maven.internal.fm7.Flexmojos7Module;
 
 /**
@@ -94,21 +95,31 @@ public class MavenFlexModule extends AbstractModule
         }
     }
 
-    public boolean isFlexProject()
+    public boolean hasFlashFramework()
     {
-        final Map<String, Artifact> dependencies = facade.getMavenProject().getArtifactMap();
-        // Supports both Adobe and Apache groupId.
-        return dependencies.containsKey( "com.adobe.flex.framework:common-framework" )
-            || dependencies.containsKey( "org.apache.flex.framework:common-framework" );
+        for ( Artifact artifact : facade.getMavenProject().getArtifacts() )
+        {
+            if ( MavenFlexPlugin.isFlashFramework( artifact ) ) return true;
+        }
+        return false;
     }
 
-    public boolean isApolloProject()
+    public boolean hasFlexFramework()
     {
-        final Map<String, Artifact> dependencies = facade.getMavenProject().getArtifactMap();
-        // Supports both Adobe and Apache groupId.
-        return dependencies.containsKey( "com.adobe.flex.framework:air-framework" )
-            || dependencies.containsKey( "com.adobe.flex.framework.air:air-framework" )
-            || dependencies.containsKey( "org.apache.flex.framework.air:air-framework" );
+        for ( Artifact artifact : facade.getMavenProject().getArtifacts() )
+        {
+            if ( MavenFlexPlugin.isFlexFramework( artifact ) ) return true;
+        }
+        return false;
+    }
+
+    public boolean hasAirFramework()
+    {
+        for ( Artifact artifact : facade.getMavenProject().getArtifacts() )
+        {
+            if ( MavenFlexPlugin.isAirFramework( artifact ) ) return true;
+        }
+        return false;
     }
 
     public String getPackaging()

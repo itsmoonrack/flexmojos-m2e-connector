@@ -12,6 +12,7 @@ import net.flexmojos.m2e.maven.ISignAirMojo;
 import net.flexmojos.m2e.maven.internal.discovery.ServerDiscovery;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Build;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -47,35 +48,33 @@ public abstract class MavenFlexPlugin implements IMavenFlexPlugin
     }
 
     @Override
+    public Artifact getFlashFramework()
+    {
+        for ( Artifact artifact : facade.getMavenProject().getArtifacts() )
+        {
+            if ( isFlashFramework( artifact ) ) return artifact;
+        }
+        return null;
+    }
+
+    @Override
+    public Artifact getAirFramework()
+    {
+        for ( Artifact artifact : facade.getMavenProject().getArtifacts() )
+        {
+            if ( isAirFramework( artifact ) ) return artifact;
+        }
+        return null;
+    }
+
+    @Override
     public Artifact getFlexFramework()
     {
-        final Map<String, Artifact> artifacts = facade.getMavenProject().getArtifactMap();
-
-        // Checks an Apache Flex Framework artifact exists.
-        if ( artifacts.containsKey( "org.apache.flex.framework:flex-framework" ) )
-            // If it does, return the instance of Apache Flex framework artifact.
-            return artifacts.get( "org.apache.flex.framework:flex-framework" );
-
-        // Checks an Adobe Flex Framework artifact exists.
-        if ( artifacts.containsKey( "com.adobe.flex.framework:flex-framework" ) )
-            // If it does, return the instance of Adobe Flex Framework artifact.
-            return artifacts.get( "com.adobe.flex.framework:flex-framework" );
-
-        // TODO: Move the following air-framework in a new method getAirFramework() ?
-        if ( artifacts.containsKey( "org.apache.flex.framework.air:air-framework" ) )
-            // If it does, return the instance of Apache Flex AIR Framework artifact.
-            return artifacts.get( "org.apache.flex.framework.air:air-framework" );
-
-        if ( artifacts.containsKey( "com.adobe.flex.framework.air:air-framework" ) )
-            // If it does, return the instance of Adobe Flex AIR Framework artifact.
-            return artifacts.get( "com.adobe.flex.framework.air:air-framework" );
-
-        if ( artifacts.containsKey( "com.adobe.flex.framework:air-framework" ) )
-            // If it does, return the instance of Adobe Flex AIR Framework artifact.
-            return artifacts.get( "com.adobe.flex.framework:air-framework" );
-
-        // Informs user that Flex Framework artifact could not be found.
-        throw new RuntimeException( "Flex Framework not found in project's artifacts." );
+        for ( Artifact artifact : facade.getMavenProject().getArtifacts() )
+        {
+            if ( isFlexFramework( artifact ) ) return artifact;
+        }
+        return null;
     }
 
     @Override
@@ -135,36 +134,76 @@ public abstract class MavenFlexPlugin implements IMavenFlexPlugin
     @Override
     public IPath getCertificatePath()
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Map<String, Artifact> getDependencies()
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public IPath getLocalesSourcePath()
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String[] getLocalesCompiled()
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Map<String, IPath> getXMLNamespaceManifestPath()
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Returns <tt>true</tt> if this artifact belongs to Flash Framework.
+     *
+     * @param artifact The artifact to test.
+     * @return <tt>true</tt> if this artifact belongs to Flash Framework.
+     */
+    public static boolean isFlashFramework( final Artifact artifact )
+    {
+        String artifactKey = ArtifactUtils.versionlessKey(artifact);
+        return artifactKey.equals( "com.adobe.flash:framework" )
+            || artifactKey.equals( "com.adobe.flash.framework:playerglobal" )
+            || artifactKey.equals( "com.adobe.air.framework:playerglobal" )
+            || artifactKey.equals( "com.adobe.flex.framework:playerglobal" );
+    }
+
+    /**
+     * Returns <tt>true</tt> if this artifact belongs to Air Framework.
+     *
+     * @param artifact The artifact to test.
+     * @return <tt>true</tt> if this artifact belongs to Air Framework.
+     */
+    public static boolean isAirFramework( final Artifact artifact )
+    {
+        String artifactKey = ArtifactUtils.versionlessKey(artifact);
+        return artifactKey.equals( "org.apache.flex.framework:air" )
+            || artifactKey.equals( "org.apache.flex.framework.air:airframework" )
+            || artifactKey.equals( "com.adobe.air:framework" )
+            || artifactKey.equals( "com.adobe.air.framework:airglobal" );
+    }
+
+    /**
+     * Returns <tt>true</tt> if this artifact belongs to Flex Framework.
+     *
+     * @param artifact The artifact to test.
+     * @return <tt>true</tt> if this artifact belongs to Flex Framework.
+     */
+    public static boolean isFlexFramework( final Artifact artifact )
+    {
+        String artifactKey = ArtifactUtils.versionlessKey(artifact);
+        return artifactKey.equals( "org.apache.flex.framework:common-framework" )
+            || artifactKey.equals( "org.apache.flex.framework:framework" )
+            || artifactKey.equals( "com.adobe.flex.framework:common-framework" )
+            || artifactKey.equals( "com.adobe.flex.framework:framework" );
     }
 
 }
